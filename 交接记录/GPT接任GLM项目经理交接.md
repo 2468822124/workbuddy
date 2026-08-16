@@ -523,3 +523,22 @@ check/manual/extra 等完成凭据 → 任务实例完成态。
 - **权限核对**：未修改 `workbuddy/` 源代码、测试、配置或迁移；未修改 `当前代码状态.md`；未修改 DeepSeek 实现日志和修复日志。
 - **核验方式**：通过 `rg` 对 `规范类/`、`模板/`、`用户prompt/` 和当前主线文件扫描现行角色；保留的 GLM 命中均属于文件名兼容说明、历史事实或交接记录引用。
 - **提交状态**：本条记录随治理迁移分支提交，提交哈希在后续 Git 核验记录中补充；不静默改写本段历史。
+
+### 2026-08-16 · 阶段 3 GPT 独立复审执行记录
+
+- **执行者与权限**：GPT；仅执行审查、治理文档维护和 Git 版本管理，未执行源代码、测试、配置、数据库迁移或 DeepSeek 实现日志的修改。
+- **复审对象**：`用户打回重构/任务数据流通重构/阶段3-日规划与rail-全流程闭环记录.md` 中的修复批次 1，覆盖 F1、F2、F3、F5；F4 继续按历史首审结论作为 LOW 延后项。
+- **静态代码证据**：独立核对 `useFlowDay.ts` 的 `weekBoard` → `dayBoard` 严格串行装载及失败短路、`DayEntryRow.vue` → `DayEntryList.vue` → `useFlowDay.ts` → preload 的 `string | null` 备注类型链、`TemplatePanel.vue` 的空模板选择反馈和 `confirmApply` 非空保护。结论为 F1、F2、F3、F5 已解决。
+- **运行级证据**：在 `E:\workspace\workbuddy` 独立执行 `npm.cmd test`、`npm.cmd run build`、`npx.cmd tsc -p tsconfig.node.json --noEmit`、`npx.cmd tsc -p tsconfig.web.json --noEmit`。结果为测试 247/247 通过、main/preload/renderer 构建通过；Node 与 Web 类型检查仅保留已记录的存量错误边界，未发现阶段 3 flow 域新增错误。
+- **边界证据**：修复窗口仅涉及 4 个 renderer 文件；未新增 IPC、迁移、依赖、侧边栏入口或冻结区触碰。加入本交接日志前，工作区差异仅为 `当前审查状态.md` 和本阶段 3 全流程记录两份治理文档；加入本次日志后，待提交内容为这两份审查文档和本交接日志三份治理文档。
+- **结论及证据等级**：阶段 3 修复批次 1达到“代码级开发部分闭环通过”，但仍为“待用户 GUI E2E”。今天、昨日顺延、上周同日历史只读、下周一未来日期、rail、模板、感想、锁定行和周统筹凭据回退等 Electron GUI 证据尚未由 GPT 或用户在本记录中完成；不得以静态代码或自动化测试替代用户实测，不得据此标记 `0.3.0`。
+- **关联记录**：详细逐项证据见上述阶段 3 全流程记录末尾的“GPT 复审环节”；覆盖式当前结论见 `当前审查状态.md`。历史 GLM 首审原文保持不变。
+
+### 2026-08-16 · GPT 复审提交前 Git 核验
+
+- **当前分支**：`work/stage-3-gpt-review`，基于治理迁移提交 `6b98e05`；`main` 和 `work/docs-gpt-handover` 均停留在 `6b98e05`。
+- **身份**：本地仓库身份为 `GPT Project Manager <gpt-project-manager@local>`。
+- **现有提交**：`b8dcb30 chore(repo): establish project baseline`；`6b98e05 docs(governance): transfer active GLM ownership to GPT`。
+- **本次待提交内容**：阶段 3 GPT 复审记录和当前审查状态更新，计划使用 `docs(review): record GPT review for stage 3`；提交完成后按已批准流程快进合并回 `main`。
+- **事实更正规则**：本节此前记录的“零提交”“本地身份尚未配置”是 2026-08-16 建立基线前的历史核验结果，不是当前状态；本条以提交图、`git status`、`git config --local` 和后续最终核验命令为准，不静默改写历史。
+- **Git 边界**：未配置远端、CI、自动提交钩子或 Git LFS；`.gitignore` 继续排除 `node_modules`、`dist`、`out`、安装包、PDF、`memory`、`.claude` 和临时文件。

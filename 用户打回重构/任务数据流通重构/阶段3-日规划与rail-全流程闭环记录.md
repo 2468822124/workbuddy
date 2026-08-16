@@ -636,4 +636,74 @@ cd workbuddy && npm run dev
 
 ---
 
-**（后续环节：🔁 复审（GLM），按时间正序在此续写）**
+**（后续环节：🔁 复审（GPT），按时间正序在此续写）**
+
+---
+
+## 🔁 复审环节 · GPT 复审1（阶段3修复批次1，2026-08-16）
+
+> **角色声明**：本节是 GPT 接任后的新增复审记录；既有 GLM 首审、DeepSeek 修复日志和历史结论保持原样。
+> **审查依据**：本记录「规格」环节 §9 验收点与 §10 禁止边界/错误降级、DeepSeek 修复日志、`规范类/技术栈规范.md §10`、`当前审查状态.md`。
+> **审查方法**：独立读码 + 独立复跑 test/build/tsc + 文件时间窗口与冻结区核查；不把 DeepSeek 自测声明直接当作 GPT 结论。
+> **证据分类**：下文的“代码级/运行级”不等于用户 GUI E2E；GUI E2E 由用户另行实测。
+
+### 1. 复审范围
+
+- **修复批次**：阶段3 修复批次1，回应 F1/F2/F3/F5；F4 按首审结论延后。
+- **声明范围**：`useFlowDay.ts`、`DayEntryRow.vue`、`DayEntryList.vue`、`TemplatePanel.vue` 4 个 renderer 文件；零新增 IPC、迁移和依赖。
+- **GPT 实际核对**：上述 4 个文件，以及 preload 类型契约、阶段3 flow 页面调用链、冻结区和构建配置。
+
+### 2. 逐条修复核对
+
+| # | 修复要求 | GPT 独立核对 | 结论 | 证据 |
+|---|---|---|---|---|
+| F1 | `weekBoard` 必须先于 `dayBoard`，失败时短路 | `useFlowDay.ts:103-129` 使用两段独立 `await`；`wbRes.ok` 直接决定是否调用 `dayBoard`；失败分支将 `dayBoard` 置空并显示错误态；注释明确“严格串行、禁并行” | ✅ 已解决 | 静态代码核对；未发现 `Promise.all` 装载残留 |
+| F2 | 备注清空链统一为 `string \| null` | `DayEntryRow` emit、`DayEntryList` 转发、`useFlowDay.updateEntryNote` 和 preload `entry.update` 均接受 `string \| null`；空串显式转为 `null` | ✅ 已解决 | `DayEntryRow.vue:20,57-60`、`DayEntryList.vue:21,80,102`、`useFlowDay.ts:205-206`、`preload/index.ts:258-259` |
+| F3 | 模板全不选时不得静默无反馈 | `selectedCount` 只统计勾选且非空文本；按钮 `disabled`；确认卡显示“请至少勾选一项”；函数内保留空数组保护 | ✅ 已解决 | `TemplatePanel.vue:53-63,104-109,244-245` |
+| F5 | 消除 `applyTplId.value!` 非空断言 | `confirmApply` 先取局部 `id` 并判空，再发出 `apply` | ✅ 已解决 | `TemplatePanel.vue:56-64`；未发现 `value!` 残留 |
+| F4 | saving 状态固定 1 秒 | 本批次未要求修复，首审已标为可延后 LOW | ⏸ 延后 | `JournalBlock.vue` 未纳入本批次范围，不阻断阶段3开发门禁 |
+
+### 3. 独立门禁复跑
+
+执行日期：2026-08-16；工作目录：`E:\workspace\workbuddy`。
+
+| 验收 | 命令 | GPT 实际结果 | 结论 |
+|---|---|---|---|
+| 全量测试 | `npm.cmd test` | 18 个测试文件通过，247/247 通过，耗时 2.63s | ✅ 运行级通过 |
+| 构建 | `npm.cmd run build` | main、preload、renderer 均构建成功，renderer 构建 2.66s | ✅ 运行级通过 |
+| Node 类型检查 | `npx.cmd tsc -p tsconfig.node.json --noEmit` | 唯一错误为存量 `src/main/services/news.ts:22` 的 `NewsProviderConfig` 类型不匹配 | ✅ 阶段3无新增错误；存量错误保留 |
+| Web 类型检查 | `npx.cmd tsc -p tsconfig.web.json --noEmit` | 仅旧项目 `useProjectDetail.ts`/`useProjects.ts` 类型错误和全局 `.vue` 声明错误；未出现 flow 域纯 `.ts` 新错误 | ✅ 阶段3 flow 逻辑通过；全仓仍有存量错误 |
+
+测试输出中的 Vite 配置提示、Vitest mock hoist 提示和 SQLite 实验性提示均未导致失败，按警告记录，不伪装为零警告。
+
+### 4. 冻结区与越界核查
+
+- **修复文件时间窗口**：`DayEntryRow.vue` 22:18:18、`DayEntryList.vue` 22:18:29、`useFlowDay.ts` 22:18:30、`TemplatePanel.vue` 22:19:36（2026-08-15）。与 DeepSeek 声明的 4 文件范围一致。
+- **阶段3首次实现文件**：`FlowDayView.vue` 19:34:54，属于首次实现窗口，不计入本修复批次。
+- **未进入修复窗口的边界文件**：`src/main/ipc/flow.ipc.ts` 2026-08-14 21:43:35、`src/preload/index.ts` 21:43:41、`src/shared/ipc.ts` 21:43:24、`0008_flow_task_domain.ts` 21:10:00、`AppSidebar.vue` 2026-08-08 09:31:59、`package.json` 2026-08-10 21:56:40。
+- **结构边界**：修复未新增 IPC、数据库迁移、依赖、侧边栏入口；renderer 仍通过 composable/preload 访问 flow API，SQL 未进入 renderer。
+- **工作区核对**：GPT 复审前后 `git status` 无代码、测试、配置或 `当前代码状态.md` 改动；复审只追加本文档和审查看板。
+
+### 5. GUI 证据边界
+
+GPT 未执行 Electron GUI E2E，以下项目继续标记为用户证据待补，不得由本节的代码级通过替代：
+
+- 今天、昨日顺延、上周同日历史只读、下周一未来日期。
+- rail 选取/移除回现、跳过免罪、挪动、模板套用确认卡、感想保存反馈。
+- 锁定行勾选 → `/flow/week` 凭据弹层查看 check 凭据 → 删除并回退。
+- 视觉样张、真实交互、焦点/活动态和窗口适配的实际渲染。
+
+### 6. GPT 复审结论
+
+**✅ 通过（代码级开发部分闭环）/ 🔜 待用户 GUI E2E**
+
+- F1、F2、F3、F5 均已独立核实解决；F4 仍为已记录的 LOW 延后项。
+- 阶段3 27 项验收点维持代码级全通过；测试、build、tsc 存量边界和冻结区证据均已记录。
+- 该结论只关闭“开发部分闭环”，不宣称用户实测闭环，也不允许现在标记 `0.3.0` 发布。
+- `flow.ipc.ts` 直接测试债务及阶段2 F6/F7 仍为已知技术债，不属于本批次新问题。
+
+### 7. 后续门禁
+
+1. 用户完成阶段3 GUI E2E 并记录真实操作结果；发现问题则转用户反馈/增量开发闭环。
+2. GPT 在用户 GUI E2E 未完成前，不启动阶段4实现；阶段4必须先由 GPT 形成详细规格并冻结接口，经用户确认后才交 DeepSeek。
+3. 阶段6完成路由切换、冻结区清理、旧域只读归档、六轮业务意图回归和最终用户实测后，才允许标记 `0.3.0` 并更新 CHANGELOG。
