@@ -1,0 +1,36 @@
+{
+  "name": "workbuddy",
+  "version": "0.2.0",
+  "description": "AI 原生个人工作台 — WorkBuddy",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "test": "vitest run",
+    "preview": "electron-vite preview",
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "pack:win": "electron-vite build && electron-builder --win --x64 --dir",
+    "dist:win": "electron-vite build && electron-builder --win --x64"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "dompurify": "^3.2.4",
+    "lucide-vue-next": "^0.447.0",
+    "marked": "^15.0.12",
+    "rss-parser": "^3.13.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
+    "electron-rebuild": "^3.2.9",
+    "electron-vite": "^2.3.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.7.3",
+    "vite": "^5.4.0",
+    "vitest": "^4.1.10"
+  }
+}

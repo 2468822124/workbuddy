@@ -1,0 +1,105 @@
+export const IPC = {
+  SETTINGS_GET: 'settings:get',
+  SETTINGS_SET: 'settings:set',
+  SETTINGS_GET_ALL: 'settings:getAll',
+  DB_HEALTH: 'db:health',
+  APP_FIRST_LAUNCH: 'app:isFirstLaunch',
+  NEWS_LIST: 'news:list',
+  NEWS_REFRESH: 'news:refresh',
+  MORNING_STATUS: 'morning:status',
+  TODOS_TODAY: 'todos:today',
+  TODOS_OVERDUE: 'todos:overdue',
+  TODOS_TOGGLE: 'todos:toggle',
+  TODOS_RESCHEDULE_TODAY: 'todos:rescheduleToday',
+  TODOS_QUICK_CREATE: 'todos:quickCreate',
+  PROJECTS_LIST: 'projects:list',
+  PROJECTS_GET: 'projects:get',
+  PROJECTS_CREATE: 'projects:create',
+  PROJECTS_UPDATE: 'projects:update',
+  PROJECTS_DELETE: 'projects:delete',
+  TODOS_BY_PROJECT: 'todos:byProject',
+  TODOS_CREATE: 'todos:create',
+  TODOS_UPDATE: 'todos:update',
+  TODOS_DELETE: 'todos:delete',
+  LLM_TEST: 'llm:test',
+  DATA_EXPORT: 'data:export',
+  DATA_IMPORT: 'data:import',
+  LLM_SEARCH: 'llm:search',
+  TEMPLATES_LIST: 'templates:list',
+  TEMPLATES_GET: 'templates:get',
+  TEMPLATES_UPSERT: 'templates:upsert',
+  TEMPLATES_DELETE: 'templates:delete',
+  PLAN_GET: 'plan:get',
+  PLAN_LIST: 'plan:list',
+  PLAN_BY_DATE: 'plan:byDate',
+  PLAN_CREATE: 'plan:create',
+  PLAN_UPDATE: 'plan:update',
+  PLAN_DELETE: 'plan:delete',
+  REVIEW_GET: 'review:get',
+  REVIEW_LIST: 'review:list',
+  REVIEW_BY_DATE: 'review:byDate',
+  REVIEW_CREATE: 'review:create',
+  REVIEW_UPDATE: 'review:update',
+  REVIEW_DELETE: 'review:delete',
+  PLAN_GUIDE: 'plan:guideQuestion',
+  REVIEW_SUMMARIZE: 'review:summarizeDraft',
+  // 子阶段5：规划体系
+  PLAN_GET_BY_PERIOD: 'plan:getByPeriod',
+  PLAN_LIST_TASKS_BY_PERIOD: 'plan:listTasksByPeriod',
+  PLAN_MARK_TASK_CONSUMED: 'plan:markTaskConsumed',
+  PLAN_MARK_TASK_UNCONSUMED: 'plan:markTaskUnconsumed',
+  REVIEW_SUMMARIZE_WEEKLY: 'review:summarizeWeekly',
+  REVIEW_SUMMARIZE_MONTHLY: 'review:summarizeMonthly',
+  // 子阶段5：范围查询（月图表确定性数据源；规格 §5.6 授权 DeepSeek 选实现）
+  TODOS_FIND_IN_RANGE: 'todos:findInRange',
+  // 用户反馈3.2 F3.2-2：今日+逾期聚合返回，附带 sourceLabel 出处标注
+  TODOS_WITH_SOURCE: 'todos:withSource',
+  // v0.2修复计划·参照完整性：pick 时预关联（确保 parent tid 写回父计划 + 分配 child tid）
+  PLAN_PREPARE_TASK_LINK: 'plan:prepareTaskLink',
+  // v0.2修复计划·参照完整性：todo 来源链逐级解析（todo → 周任务 → 月任务 → 源头）
+  TASK_RESOLVE_CHAIN: 'task:resolveChain',
+  // ===== 任务数据流通重构（阶段1：flow_ 新任务域，与旧模块物理隔离） =====
+  FLOW_WEEK_BOARD: 'flow:weekBoard',
+  FLOW_DAY_BOARD: 'flow:dayBoard',
+  FLOW_FIXED_DEFS_LIST: 'flow:fixedDefs:list',
+  FLOW_FIXED_DEFS_SAVE: 'flow:fixedDefs:save',
+  FLOW_FIXED_DEFS_DELETE: 'flow:fixedDefs:delete',
+  FLOW_INSTANCE_CREATE: 'flow:instance:create',
+  FLOW_INSTANCE_RENAME: 'flow:instance:rename',
+  FLOW_INSTANCE_DELETE: 'flow:instance:delete',
+  FLOW_INSTANCE_SKIP: 'flow:instance:skip',
+  FLOW_INSTANCE_CARRY_NEXT: 'flow:instance:carryNext',
+  FLOW_INSTANCE_MANUAL_COMPLETE: 'flow:instance:manualComplete',
+  FLOW_INSTANCE_ADD_SESSION: 'flow:instance:addSession',
+  FLOW_VOUCHER_DELETE: 'flow:voucher:delete',
+  FLOW_VOUCHER_UPDATE: 'flow:voucher:update',
+  FLOW_ENTRY_ADD: 'flow:entry:add',
+  FLOW_ENTRY_TOGGLE_CHECK: 'flow:entry:toggleCheck',
+  FLOW_ENTRY_REMOVE: 'flow:entry:remove',
+  FLOW_ENTRY_MOVE: 'flow:entry:move',
+  FLOW_ENTRY_SKIP: 'flow:entry:skip',
+  FLOW_ENTRY_UPDATE: 'flow:entry:update',
+  FLOW_MONTH_GOALS_LIST: 'flow:monthGoals:list',
+  FLOW_MONTH_GOALS_SAVE: 'flow:monthGoals:save',
+  FLOW_MONTH_GOALS_DELETE: 'flow:monthGoals:delete',
+  FLOW_WEEK_FOCUS_LIST: 'flow:weekFocus:list',
+  FLOW_WEEK_FOCUS_SAVE: 'flow:weekFocus:save',
+  FLOW_WEEK_FOCUS_DELETE: 'flow:weekFocus:delete',
+  FLOW_TEMPLATES_LIST: 'flow:templates:list',
+  FLOW_TEMPLATES_SAVE: 'flow:templates:save',
+  FLOW_TEMPLATES_DELETE: 'flow:templates:delete',
+  FLOW_JOURNAL_GET: 'flow:journal:get',
+  FLOW_JOURNAL_SAVE: 'flow:journal:save',
+} as const
+
+export type Result<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: { code: string; message: string } }
+
+export function ok<T>(data: T): Result<T> {
+  return { ok: true, data }
+}
+
+export function err(code: string, message: string): Result<never> {
+  return { ok: false, error: { code, message } }
+}

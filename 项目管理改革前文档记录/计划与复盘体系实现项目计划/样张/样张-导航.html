@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>样张 · 导航与信息架构 — WorkBuddy</title>
+<style>
+:root{
+  --bg-app:#FBF7EF;--bg-surface:#FFFBF3;--bg-surface-2:#F4ECDE;--bg-sunken:#F1E8D8;--bg-hover:#F7EFE2;
+  --text-strong:#3A322C;--text-base:#5C5249;--text-muted:#8B7F73;--text-faint:#B0A499;--text-disabled:#C9BEB1;--text-on-primary:#FFF8EE;
+  --accent:#C7704E;--accent-hover:#B66241;--accent-soft:#F0DDD1;--accent-ring:#E2B9A6;
+  --cat-learn-soft:rgba(138,155,110,.16);--cat-work-soft:rgba(199,112,78,.12);--ok-soft:rgba(126,155,110,.16);--warn-soft:rgba(207,158,91,.18);
+  --ok:#7E9B6E;--warn:#CF9E5B;--danger:#B0564B;
+  --border-soft:#EBE2D3;--border:#DDD0BC;--border-strong:#C9B89E;
+  --shadow-sm:0 1px 3px rgba(122,100,76,.06),0 1px 2px rgba(122,100,76,.04);
+  --shadow-md:0 4px 12px rgba(122,100,76,.07),0 2px 4px rgba(122,100,76,.04);
+  --font-sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --fs-h1:22px;--fs-h2:17px;--fs-body:14.5px;--fs-small:13px;--fs-caption:11.5px;
+  --s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;--s12:48px;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:999px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);color:var(--text-base);background:var(--bg-app);
+  background-image:radial-gradient(circle,rgba(122,100,76,.05) 1px,transparent 1px);background-size:22px 22px;
+  font-size:var(--fs-body);line-height:1.6;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+/* sidebar (the star of this mockup) */
+.sidebar{width:250px;flex-shrink:0;background:var(--bg-surface);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:var(--s5) var(--s3);position:relative}
+.sidebar::after{content:"↑ 规划：合并原「计划」+「复盘」，点击展开日/周/月三级";position:absolute;left:262px;top:178px;
+  background:var(--accent);color:var(--text-on-primary);font-size:var(--fs-caption);font-weight:600;padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;box-shadow:var(--shadow-md);z-index:5}
+.brand{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s3) var(--s6)}
+.brand-mark{width:34px;height:34px;border-radius:var(--r-sm);background:var(--accent);color:var(--text-on-primary);display:grid;place-items:center;font-weight:700;box-shadow:var(--shadow-sm)}
+.brand-name{font-size:15px;font-weight:700;color:var(--text-strong)}
+.brand-tag{font-size:var(--fs-caption);color:var(--text-faint)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-bottom{margin-top:auto}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:var(--r-sm);color:var(--text-muted);font-size:var(--fs-body);cursor:pointer;transition:all .15s}
+.nav-item:hover{background:var(--bg-hover);color:var(--text-strong)}
+.nav-item.disabled{color:var(--text-disabled);cursor:not-allowed}
+.nav-item .ic{width:17px;height:17px;flex-shrink:0;display:grid;place-items:center}
+.nav-item.disabled .tag{margin-left:auto;font-size:10px;color:var(--text-faint)}
+.nav-parent{font-weight:600;color:var(--text-strong)}
+.nav-parent .chev{margin-left:auto;color:var(--text-faint);transition:transform .2s}
+.nav-group.open .chev{transform:rotate(90deg)}
+.nav-children{margin-left:18px;padding-left:12px;border-left:1.5px solid var(--border-soft);margin-top:2px;display:flex;flex-direction:column;gap:1px}
+.nav-child{display:flex;align-items:center;gap:var(--s2);padding:7px var(--s3);border-radius:var(--r-sm);color:var(--text-muted);font-size:var(--fs-small);cursor:pointer}
+.nav-child:hover{background:var(--bg-hover);color:var(--text-strong)}
+.nav-child.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-child .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+.nav-child.active .dot{opacity:1}
+.main{flex:1;overflow-y:auto;padding:var(--s8)}
+.page-title{font-size:var(--fs-h1);font-weight:700;color:var(--text-strong);margin-bottom:4px}
+.page-sub{font-size:var(--fs-small);color:var(--text-muted);margin-bottom:var(--s6)}
+/* before / after */
+.ba-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);margin-bottom:var(--s8)}
+.ba-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:var(--r-lg);padding:var(--s5);box-shadow:var(--shadow-sm)}
+.ba-card.new{border:1.5px solid var(--accent);background:linear-gradient(180deg,#FFFBF3,var(--accent-soft))}
+.ba-label{font-size:var(--fs-caption);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:var(--s4)}
+.ba-card.new .ba-label{color:var(--accent)}
+.mini-nav{display:flex;flex-direction:column;gap:2px}
+.mn-item{padding:6px 10px;border-radius:var(--r-sm);font-size:var(--fs-small);color:var(--text-muted);display:flex;align-items:center;gap:var(--s2)}
+.mn-item.dim{color:var(--text-faint);text-decoration:line-through}
+.mn-item.acc{color:var(--accent);font-weight:600;background:var(--accent-soft)}
+.mn-child{padding:5px 10px 5px 26px;font-size:var(--fs-caption);color:var(--accent);font-weight:600}
+.ba-note{margin-top:var(--s3);font-size:var(--fs-caption);color:var(--text-muted);line-height:1.6}
+/* three levels */
+.lvls{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin-bottom:var(--s8)}
+.lvl-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:var(--r-lg);padding:var(--s5);box-shadow:var(--shadow-sm)}
+.lvl-head{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)}
+.lvl-num{width:26px;height:26px;border-radius:var(--r-sm);background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.lvl-name{font-size:15px;font-weight:700;color:var(--text-strong)}
+.lvl-ritual{display:inline-block;font-size:var(--fs-caption);color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:var(--r-pill);margin-bottom:var(--s3)}
+.lvl-desc{font-size:var(--fs-small);color:var(--text-muted);line-height:1.6}
+.lvl-desc b{color:var(--text-strong)}
+/* auto task */
+.auto-card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:var(--r-lg);padding:var(--s5);box-shadow:var(--shadow-sm);margin-bottom:var(--s6)}
+.auto-head{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s4)}
+.auto-head h2{font-size:var(--fs-h2);font-weight:700;color:var(--text-strong)}
+.auto-head .tag{font-size:var(--fs-caption);color:var(--text-faint)}
+.todo-mini{background:var(--bg-sunken);border-radius:var(--r-md);padding:var(--s3);display:flex;flex-direction:column;gap:var(--s2)}
+.todo-item{display:flex;align-items:center;gap:var(--s3);padding:7px var(--s3);border-radius:var(--r-sm);font-size:var(--fs-small);color:var(--text-base)}
+.todo-item .box{width:16px;height:16px;border:1.8px solid var(--border-strong);border-radius:5px;flex-shrink:0}
+.todo-item.auto{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.todo-item.auto .box{border-color:var(--accent);background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px}
+.auto-explain{margin-top:var(--s3);font-size:var(--fs-caption);color:var(--text-muted);line-height:1.6}
+.auto-explain b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">W</div><div><div class="brand-name">WorkBuddy</div><div class="brand-tag">你的工作伙伴</div></div></div>
+    <nav class="nav">
+      <a class="nav-item"><span class="ic">▣</span>今日总览</a>
+      <a class="nav-item"><span class="ic">▦</span>项目</a>
+      <div class="nav-group open">
+        <a class="nav-item nav-parent"><span class="ic">✦</span>规划<span class="ic chev">▸</span></a>
+        <div class="nav-children">
+          <a class="nav-child"><span class="dot"></span>日规划</a>
+          <a class="nav-child"><span class="dot"></span>周统筹</a>
+          <a class="nav-child"><span class="dot"></span>月指导</a>
+        </div>
+      </div>
+      <a class="nav-item disabled"><span class="ic">≋</span>知识库<span class="tag">敬请期待</span></a>
+      <a class="nav-item disabled"><span class="ic">♡</span>运动<span class="tag">敬请期待</span></a>
+    </nav>
+    <div class="nav-bottom"><a class="nav-item"><span class="ic">⚙</span>设置</a></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-title">规划 · 信息架构变更</div>
+    <div class="page-sub">计划 + 复盘 合并为统一「规划」，按日 / 周 / 月三级展开</div>
+
+    <!-- before / after -->
+    <div class="ba-row">
+      <div class="ba-card">
+        <div class="ba-label">原结构（已废）</div>
+        <div class="mini-nav">
+          <div class="mn-item dim">▣ 今日总览</div>
+          <div class="mn-item dim">▦ 项目</div>
+          <div class="mn-item dim">📋 计划 <span style="margin-left:auto;font-size:11px">→ 仅日计划</span></div>
+          <div class="mn-item dim">📝 复盘 <span style="margin-left:auto;font-size:11px">→ 日/周复盘</span></div>
+          <div class="mn-item dim">≋ 知识库</div>
+        </div>
+        <div class="ba-note">问题：复盘一结束立刻要规划下一期，却要在「复盘」「计划」两板块来回跳，冗余。</div>
+      </div>
+      <div class="ba-card new">
+        <div class="ba-label">新结构</div>
+        <div class="mini-nav">
+          <div class="mn-item">▣ 今日总览 <span style="margin-left:auto;font-size:11px;color:var(--text-muted)">留执行</span></div>
+          <div class="mn-item">▦ 项目</div>
+          <div class="mn-item acc">✦ 规划（展开）</div>
+          <div class="mn-child">— 日规划</div>
+          <div class="mn-child">— 周统筹</div>
+          <div class="mn-child">— 月指导</div>
+          <div class="mn-item">≋ 知识库</div>
+        </div>
+        <div class="ba-note">「回顾 + 规划」同页一线流转，三级按时间海拔递进。</div>
+      </div>
+    </div>
+
+    <!-- three levels -->
+    <div class="lvls">
+      <div class="lvl-card">
+        <div class="lvl-head"><div class="lvl-num">日</div><div class="lvl-name">日规划</div></div>
+        <div class="lvl-ritual">晚间仪式</div>
+        <div class="lvl-desc"><b>回顾今日</b> + <b>规划明日</b>。任务保存→每日待办。<br>可从「本周周任务」点选下沉。</div>
+      </div>
+      <div class="lvl-card">
+        <div class="lvl-head"><div class="lvl-num">周</div><div class="lvl-name">周统筹</div></div>
+        <div class="lvl-ritual">周末仪式</div>
+        <div class="lvl-desc"><b>回顾本周</b> + <b>规划下周</b>。周任务不进待办。<br>可从「本月月任务」点选下沉。周一定义起点。</div>
+      </div>
+      <div class="lvl-card">
+        <div class="lvl-head"><div class="lvl-num">月</div><div class="lvl-name">月指导</div></div>
+        <div class="lvl-ritual">月末仪式</div>
+        <div class="lvl-desc"><b>回顾本月</b> + <b>规划下月</b>。月任务是级联源头，不进待办，出现在周统筹供选取。</div>
+      </div>
+    </div>
+
+    <!-- auto task -->
+    <div class="auto-card">
+      <div class="auto-head">
+        <h2>自动提醒任务</h2>
+        <span class="tag">在「今日总览」每日待办里自动生成，点击跳转对应规划级</span>
+      </div>
+      <div class="todo-mini">
+        <div class="todo-item"><span class="box"></span>完成项目 A 的接口联调</div>
+        <div class="todo-item auto"><span class="box">📌</span>做周统筹（今日为周日，自动添加）<span style="margin-left:auto;font-size:11px">→ 跳周统筹</span></div>
+        <div class="todo-item"><span class="box"></span>回复客户邮件</div>
+      </div>
+      <div class="auto-explain">
+        <b>触发</b>：app 启动 / 晨间唤醒时检查日期 —— 若今日=<b>周日</b>，自动添加「做周统筹」待办；若今日=<b>月最后一日</b>，自动添加「做月指导」待办。
+        点击该待办即跳转到对应规划级页面。日规划由用户每日晚间主动进行，不强制提醒。
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

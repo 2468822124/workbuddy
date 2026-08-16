@@ -1,0 +1,35 @@
+# Dependencies
+**/node_modules/
+
+# Build and packaging output
+**/dist/
+**/out/
+**/*.exe
+**/*.pdf
+coverage/
+
+# Local temporary files
+**/.tmp-*
+**/*.log
+*.tsbuildinfo
+
+# Agent/session-local state
+**/.claude/
+**/memory/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

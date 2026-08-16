@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>样张 · 周统筹 — WorkBuddy</title>
+<style>
+:root{
+  --bg-app:#FBF7EF;--bg-surface:#FFFBF3;--bg-surface-2:#F4ECDE;--bg-sunken:#F1E8D8;--bg-hover:#F7EFE2;
+  --text-strong:#3A322C;--text-base:#5C5249;--text-muted:#8B7F73;--text-faint:#B0A499;--text-disabled:#C9BEB1;--text-on-primary:#FFF8EE;
+  --accent:#C7704E;--accent-hover:#B66241;--accent-soft:#F0DDD1;--accent-ring:#E2B9A6;
+  --cat-learn-soft:rgba(138,155,110,.16);--ok-soft:rgba(126,155,110,.16);--warn-soft:rgba(207,158,91,.18);
+  --ok:#7E9B6E;--warn:#CF9E5B;--danger:#B0564B;
+  --border-soft:#EBE2D3;--border:#DDD0BC;--border-strong:#C9B89E;
+  --shadow-sm:0 1px 3px rgba(122,100,76,.06),0 1px 2px rgba(122,100,76,.04);
+  --font-sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --fs-h2:17px;--fs-body:14.5px;--fs-small:13px;--fs-caption:11.5px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;--s12:48px;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:999px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);color:var(--text-base);background:var(--bg-app);
+  background-image:radial-gradient(circle,rgba(122,100,76,.05) 1px,transparent 1px);background-size:22px 22px;
+  font-size:var(--fs-body);line-height:1.6;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:236px;flex-shrink:0;background:var(--bg-surface);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:var(--s5) var(--s3)}
+.brand{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s3) var(--s6)}
+.brand-mark{width:34px;height:34px;border-radius:var(--r-sm);background:var(--accent);color:var(--text-on-primary);display:grid;place-items:center;font-weight:700;box-shadow:var(--shadow-sm)}
+.brand-name{font-size:15px;font-weight:700;color:var(--text-strong)}
+.brand-tag{font-size:var(--fs-caption);color:var(--text-faint)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-bottom{margin-top:auto}
+.nav-item{display:flex;align-items:center;gap:var(--s3);padding:9px var(--s3);border-radius:var(--r-sm);color:var(--text-muted);font-size:var(--fs-body);cursor:pointer;text-decoration:none;transition:all .15s}
+.nav-item:hover{background:var(--bg-hover);color:var(--text-strong)}
+.nav-item.disabled{color:var(--text-disabled);cursor:not-allowed}
+.nav-item .ic{width:17px;height:17px;flex-shrink:0;display:grid;place-items:center}
+.nav-item.disabled .tag{margin-left:auto;font-size:10px;color:var(--text-faint)}
+.nav-parent{font-weight:600;color:var(--text-strong)}
+.nav-parent .chev{margin-left:auto;color:var(--text-faint)}
+.nav-group.open .chev{transform:rotate(90deg)}
+.nav-children{margin-left:18px;padding-left:12px;border-left:1.5px solid var(--border-soft);margin-top:2px;display:flex;flex-direction:column;gap:1px}
+.nav-child{display:flex;align-items:center;gap:var(--s2);padding:7px var(--s3);border-radius:var(--r-sm);color:var(--text-muted);font-size:var(--fs-small);cursor:pointer}
+.nav-child:hover{background:var(--bg-hover);color:var(--text-strong)}
+.nav-child.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-child .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+.nav-child.active .dot{opacity:1}
+.main{flex:1;overflow-y:auto;padding:var(--s8) var(--s8) var(--s12)}
+.page-head{display:flex;align-items:center;gap:var(--s4);margin-bottom:var(--s6);flex-wrap:wrap}
+.page-head h1{font-size:26px;font-weight:700;color:var(--text-strong);letter-spacing:-.015em}
+.period-switch{display:flex;align-items:center;gap:var(--s3);background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 14px;box-shadow:var(--shadow-sm)}
+.period-switch .ic-btn{width:26px;height:26px;border:none;background:none;border-radius:50%;cursor:pointer;display:grid;place-items:center;color:var(--text-muted);font-size:18px}
+.period-switch .ic-btn:hover{background:var(--bg-hover);color:var(--accent)}
+.period-switch .wk{font-size:var(--fs-h2);font-weight:700;color:var(--text-strong)}
+.period-switch .rg{font-size:var(--fs-small);color:var(--text-faint)}
+.head-pill{margin-left:auto;background:var(--accent);color:var(--text-on-primary);font-size:var(--fs-caption);font-weight:600;padding:5px 12px;border-radius:var(--r-pill)}
+.card{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:var(--s5);overflow:hidden}
+.card.primary{border:1.5px solid var(--accent-ring);box-shadow:0 4px 14px rgba(122,100,76,.09),0 2px 4px rgba(122,100,76,.04)}
+.card-head{display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s5);border-bottom:1px solid var(--border-soft)}
+.card-head .badge{width:28px;height:28px;border-radius:var(--r-sm);display:grid;place-items:center;color:#fff;font-size:13px}
+.card-head .badge.review{background:var(--cat-learn-soft);color:#6E7D55}
+.card-head .badge.plan{background:var(--accent)}
+.card-head h2{font-size:var(--fs-h2);font-weight:700;color:var(--text-strong)}
+.card-head .sub{font-size:var(--fs-caption);color:var(--text-faint);font-weight:400}
+.card-head .spacer{margin-left:auto}
+.role-tag{font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 9px;border-radius:var(--r-pill);text-transform:uppercase}
+.role-tag.main{color:var(--accent);background:var(--accent-soft)}
+.role-tag.minor{color:var(--text-faint);background:var(--bg-sunken)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg-surface);color:var(--text-base);font-size:var(--fs-small);font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--accent-ring);background:var(--bg-hover);color:var(--text-strong)}
+.btn-primary{background:var(--accent);color:var(--text-on-primary);border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-hover)}
+.card-body{padding:var(--s5)}
+/* review top (ring + goal scorecard) */
+.review-top{display:flex;align-items:center;gap:var(--s4);margin-bottom:var(--s4)}
+.ring{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--ok) 0 var(--p,60%),var(--bg-sunken) var(--p,60%));display:grid;place-items:center;position:relative;flex-shrink:0}
+.ring::before{content:"";position:absolute;inset:7px;background:var(--bg-surface);border-radius:50%}
+.ring .rt{position:relative;text-align:center;line-height:1.1}
+.ring .pct{font-size:16px;font-weight:700;color:var(--ok)}
+.ring .lbl{font-size:10px;color:var(--text-faint);margin-top:2px}
+.review-sum .rs-title{font-size:15px;font-weight:700;color:var(--text-strong)}
+.review-sum .rs-desc{font-size:var(--fs-small);color:var(--text-muted);margin-top:2px;line-height:1.5}
+.sec-label{font-size:var(--fs-caption);font-weight:700;color:var(--text-muted);letter-spacing:.05em;margin:var(--s5) 0 var(--s3);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.sec-label .hint{font-weight:400;color:var(--text-faint);text-transform:none;letter-spacing:0;margin-left:auto;font-style:italic}
+.scorecard{display:flex;flex-direction:column;gap:var(--s2)}
+.sc-row{display:grid;grid-template-columns:1.1fr 1.2fr auto;gap:var(--s4);align-items:center;padding:8px var(--s4);background:var(--bg-sunken);border-radius:var(--r-md)}
+.sc-cell{font-size:var(--fs-small);color:var(--text-base);line-height:1.4}
+.sc-cell .lab{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--text-faint);margin-right:6px}
+.sc-cell.goal .lab{color:var(--accent)}
+.sc-cell.goal{color:var(--text-strong);font-weight:500}
+.sc-status{font-size:var(--fs-caption);font-weight:700;padding:3px 10px;border-radius:var(--r-pill);white-space:nowrap}
+.sc-status.done{color:var(--ok);background:var(--ok-soft)}
+.sc-status.partial{color:var(--warn);background:var(--warn-soft)}
+.sc-status.miss{color:var(--danger);background:rgba(176,86,75,.12)}
+/* AI doc */
+.ai-bar{display:flex;align-items:center;gap:var(--s3);margin:var(--s2) 0 var(--s3);padding:8px var(--s4);background:var(--accent-soft);border-radius:var(--r-sm);font-size:var(--fs-caption);color:var(--accent)}
+.ai-bar .when{color:var(--text-muted);font-weight:400}
+.ai-bar .sp{flex:1}
+.doc{border:1px solid var(--border-soft);border-radius:var(--r-md);background:#FFFDF8;padding:var(--s5) var(--s6)}
+.doc-sec{margin-bottom:var(--s5)}
+.doc-sec:last-child{margin-bottom:0}
+.doc-sec h3{font-size:var(--fs-body);font-weight:700;color:var(--text-strong);margin-bottom:var(--s3);display:flex;align-items:center;gap:7px}
+.doc-list{list-style:none;display:flex;flex-direction:column;gap:var(--s3);counter-reset:li}
+.doc-list.num>li{position:relative;padding-left:24px}
+.doc-list.num>li::before{counter-increment:li;content:counter(li);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--bg-sunken);color:var(--text-muted);font-size:10px;font-weight:700;display:grid;place-items:center}
+.doc-list li{font-size:var(--fs-small);color:var(--text-base);line-height:1.65}
+.doc-list li b{color:var(--text-strong)}
+.gap-card{background:var(--bg-sunken);border-radius:var(--r-sm);padding:var(--s3) var(--s4);margin-bottom:var(--s2)}
+.gap-card .gp{font-size:var(--fs-small);color:var(--text-base);line-height:1.6;margin-bottom:4px}
+.gap-card .gp:last-child{margin-bottom:0}
+.gap-card .gp b{color:var(--text-strong);font-weight:600}
+.risk-table{width:100%;border-collapse:collapse;font-size:var(--fs-small)}
+.risk-table th{text-align:left;padding:7px var(--s3);color:var(--text-faint);font-weight:600;font-size:var(--fs-caption);border-bottom:1px solid var(--border)}
+.risk-table td{padding:8px var(--s3);border-bottom:1px solid var(--border-soft);color:var(--text-base)}
+.risk-table tr:last-child td{border-bottom:none}
+.risk-table .st{font-size:var(--fs-caption);font-weight:600;white-space:nowrap}
+.risk-table .st.ok{color:var(--ok)}
+.risk-table .st.warn{color:var(--danger)}
+.risk-note{font-size:var(--fs-small);color:var(--text-base);line-height:1.65;background:var(--bg-sunken);border-radius:var(--r-sm);padding:var(--s3) var(--s4)}
+.risk-note b{color:var(--text-strong)}
+/* plan (secondary) */
+.plan-grid{display:grid;grid-template-columns:1fr 260px;gap:0}
+.editor{padding:var(--s4) var(--s5);border-right:1px solid var(--border-soft)}
+.toolbar{display:flex;align-items:center;gap:2px;margin-bottom:var(--s3);padding-bottom:var(--s3);border-bottom:1px solid var(--border-soft)}
+.tb-btn{width:28px;height:28px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;display:grid;place-items:center;color:var(--text-muted)}
+.tb-btn:hover{background:var(--bg-hover);color:var(--accent)}
+.tb-btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.editor-area{font-family:'SF Mono','Fira Code',monospace,var(--font-sans);font-size:13px;line-height:1.8;color:var(--text-strong);white-space:pre-wrap;min-height:110px}
+.editor-area h{display:block;font-weight:700;font-size:13.5px;margin-top:var(--s3)}
+.editor-area .ph{color:var(--accent);background:var(--accent-soft);padding:0 4px;border-radius:4px;font-family:var(--font-sans);font-size:12px}
+.task-note{margin-top:var(--s3);padding:6px 12px;background:var(--warn-soft);border-radius:var(--r-sm);font-size:var(--fs-caption);color:#8A6A33}
+.rail{padding:var(--s4) var(--s5);background:var(--bg-surface-2)}
+.rail-title{font-size:var(--fs-caption);font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--s2)}
+.rail-month{font-size:var(--fs-small);color:var(--accent);font-weight:600;margin-bottom:var(--s3)}
+.rail-item{background:var(--bg-surface);border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin-bottom:var(--s2);box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:var(--s2)}
+.rail-item .rt{font-size:var(--fs-small);color:var(--text-strong);flex:1;line-height:1.3}
+.pick-btn{padding:3px 8px;border:1px dashed var(--accent-ring);background:var(--accent-soft);color:var(--accent);border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.rail-hint{margin-top:var(--s3);font-size:var(--fs-caption);color:var(--text-faint);line-height:1.5;text-align:center}
+.legend{margin-top:var(--s6);padding:var(--s4);background:var(--bg-surface-2);border-radius:var(--r-md);font-size:var(--fs-caption);color:var(--text-muted);line-height:1.7}
+.legend b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">W</div><div><div class="brand-name">WorkBuddy</div><div class="brand-tag">你的工作伙伴</div></div></div>
+    <nav class="nav">
+      <a class="nav-item"><span class="ic">▣</span>今日总览</a>
+      <a class="nav-item"><span class="ic">▦</span>项目</a>
+      <div class="nav-group open">
+        <a class="nav-item nav-parent"><span class="ic">✦</span>规划<span class="ic chev">▸</span></a>
+        <div class="nav-children">
+          <a class="nav-child"><span class="dot"></span>日规划</a>
+          <a class="nav-child active"><span class="dot"></span>周统筹</a>
+          <a class="nav-child"><span class="dot"></span>月指导</a>
+        </div>
+      </div>
+      <a class="nav-item disabled"><span class="ic">≋</span>知识库<span class="tag">敬请期待</span></a>
+      <a class="nav-item disabled"><span class="ic">♡</span>运动<span class="tag">敬请期待</span></a>
+    </nav>
+    <div class="nav-bottom"><a class="nav-item"><span class="ic">⚙</span>设置</a></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>周统筹</h1>
+      <div class="period-switch">
+        <button class="ic-btn">‹</button>
+        <div><span class="wk">第 32 周</span><span class="rg">　08/04 – 08/10</span></div>
+        <button class="ic-btn">›</button>
+      </div>
+      <span class="head-pill">周末仪式 · 以复盘为主</span>
+    </div>
+
+    <!-- 复盘卡（主干）-->
+    <div class="card primary">
+      <div class="card-head">
+        <div class="badge review">↺</div>
+        <h2>回顾本周 <span class="sub">· 第 32 周</span></h2>
+        <span class="role-tag main">复盘 · 主干</span>
+        <div class="spacer"></div>
+        <button class="btn"><span class="ic">↻</span>重新生成</button>
+      </div>
+      <div class="card-body">
+        <div class="review-top">
+          <div class="ring" style="--p:78%"><div class="rt"><div class="pct">14/18</div><div class="lbl">完成率 78%</div></div></div>
+          <div class="review-sum">
+            <div class="rs-title">本周完成 14 / 18 项 · 较上周 +12%</div>
+            <div class="rs-desc">3 个项目进行中；规划体系方向锁定，反馈2 闭环。</div>
+          </div>
+        </div>
+
+        <div class="sec-label">◎ 本期目标达成对照 <span class="hint">速览</span></div>
+        <div class="scorecard">
+          <div class="sc-row">
+            <div class="sc-cell goal"><span class="lab">目标</span>完成 v0.2.0 规划重构</div>
+            <div class="sc-cell"><span class="lab">实际</span>反馈2 修复完成、方向定稿</div>
+            <span class="sc-status partial">◐ 部分</span>
+          </div>
+          <div class="sc-row">
+            <div class="sc-cell goal"><span class="lab">目标</span>周复盘 · 第 31 周</div>
+            <div class="sc-cell"><span class="lab">实际</span>已按时完成并归档</div>
+            <span class="sc-status done">✓ 达成</span>
+          </div>
+          <div class="sc-row">
+            <div class="sc-cell goal"><span class="lab">目标</span>推进月指导模板</div>
+            <div class="sc-cell"><span class="lab">实际</span>未开始</div>
+            <span class="sc-status miss">✗ 未达</span>
+          </div>
+        </div>
+
+        <div class="ai-bar"><span>✨ AI 按本周日级完成数据生成</span><span class="when" style="margin-left:8px">· 周日 21:30</span><span class="sp"></span><span style="color:var(--text-muted)">可编辑</span></div>
+
+        <div class="doc">
+          <div class="doc-sec">
+            <h3><span>🔴</span>重大事件</h3>
+            <ol class="doc-list num">
+              <li><b>规划体系 IA 演进定稿</b>：反馈1(启动修复)→反馈2(模板切换)→用户实测→合并日/周/月三级「规划」。历经多轮，方向锁定——复盘+计划合并。演进成本低于预期，反馈2 的模板 bug 反成重构契机。</li>
+              <li><b>v0.2.0 四子阶段齐备</b>：基建/计划/复盘/LLM增强 全部实现并通过审查，仅待规划重构后发版。</li>
+            </ol>
+          </div>
+
+          <div class="doc-sec">
+            <h3><span>🟢</span>亮点</h3>
+            <ol class="doc-list num">
+              <li><b>反馈2 三项修复复审通过</b>：D5 图标注册 / E1 测试连接响应体校验 / U6 复盘短路，vitest 22/22 绿。</li>
+              <li><b>完成率 78%</b>（14/18），较上周 +12%，节奏回升。</li>
+              <li><b>样张快速产出</b>：4 份 HTML 一日内出齐并完成 2 轮迭代。</li>
+            </ol>
+          </div>
+
+          <div class="doc-sec">
+            <h3><span>🟡</span>不足</h3>
+            <div class="gap-card">
+              <div class="gp"><b>现象</b>：月指导模板连续两周未推进（W31、W32 均缺位）。</div>
+              <div class="gp"><b>原因</b>：反馈2 修复占用带宽；月级优先级被日/周紧急事项系统性挤掉。</div>
+              <div class="gp"><b>改进</b>：W33 起将月指导纳入周统筹必选项——周日先做月指导，再做周统筹。</div>
+            </div>
+            <div class="gap-card">
+              <div class="gp"><b>现象</b>：知识库模块仅调研、未立项。</div>
+              <div class="gp"><b>原因</b>：无明确交付压力，一直让位于规划重构。</div>
+              <div class="gp"><b>改进</b>：W33 列为月任务，由周统筹级联下沉为周任务。</div>
+            </div>
+          </div>
+
+          <div class="doc-sec">
+            <h3><span>⚠️</span>上周风险复查</h3>
+            <table class="risk-table">
+              <thead><tr><th>W31 风险</th><th>W32 状态</th></tr></thead>
+              <tbody>
+                <tr><td>规划方向摇摆</td><td class="st ok">三级合并定稿 ✅ 已解除</td></tr>
+                <tr><td>月指导缺位</td><td class="st warn">W32 仍未推进 ⚠️ 升级正式风险</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="doc-sec">
+            <h3><span>⚠️</span>风险评估</h3>
+            <div class="risk-note"><b>新增风险 · 月级规划空转</b>：连续两周月指导缺位。规律——当周级有紧急修复时，月级被系统性跳过。"紧急事项挤掉重要不紧急"的典型模式，W33 必须打破。</div>
+          </div>
+
+          <div class="doc-sec">
+            <h3><span>➡️</span>下周计划调整建议</h3>
+            <ol class="doc-list num">
+              <li>W33 周日<b>先做月指导</b>（第一件事），再做周统筹。</li>
+              <li>知识库立项列为月任务，下沉到周统筹。</li>
+              <li>规划重构进入开发（样张已定稿）。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 规划卡（次要）-->
+    <div class="card">
+      <div class="card-head">
+        <div class="badge plan">→</div>
+        <h2>规划下周 <span class="sub">· 第 33 周 08/11–08/17</span></h2>
+        <span class="role-tag minor">规划 · 次要</span>
+        <div class="spacer"></div>
+        <button class="btn btn-primary">保存</button>
+      </div>
+      <div class="plan-grid">
+        <div class="editor">
+          <div class="toolbar">
+            <button class="tb-btn"><svg viewBox="0 0 24 24"><path d="M15 6v12M9 6v12"/></svg></button>
+            <button class="tb-btn"><svg viewBox="0 0 24 24"><path d="M8 9c0-2 2-3 4-3s4 1 4 3-2 3-4 3M8 15c0 2 2 3 4 3s4-1 4-3-2-3-4-3"/></svg></button>
+            <button class="tb-btn"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/></svg></button>
+            <button class="tb-btn"><svg viewBox="0 0 24 24"><path d="M4 14l2-2 3 3 7-7 3 3"/></svg></button>
+            <span style="flex:1"></span>
+            <button class="btn"><span class="ic">✦</span>AI 引导</button>
+          </div>
+          <div class="editor-area"><h># 周统筹 · 第 33 周</h>
+
+## 本周重点
+<span class="ph">{{focus}}</span>先月指导→再周统筹，破月级空转
+
+## 周任务
+- [ ] 月指导 · 8 月（先做）
+- [ ] 样张定稿 + 规格-子阶段5
+- [ ] 知识库立项（月任务下沉）</div>
+          <div class="task-note">⚠ 周任务不进每日待办；可在「日规划」点选下沉到某天。</div>
+        </div>
+        <aside class="rail">
+          <div class="rail-title">本月月任务</div>
+          <div class="rail-month">2026 年 8 月</div>
+          <div class="rail-item"><span class="rt">发布 v0.2.0</span><button class="pick-btn">选取</button></div>
+          <div class="rail-item"><span class="rt">月度复盘 · 8 月</span><button class="pick-btn">选取</button></div>
+          <div class="rail-item"><span class="rt">梳理 Q3 目标</span><button class="pick-btn">选取</button></div>
+          <div class="rail-hint">从本月月指导点选 →<br>加入本周周任务</div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>周统筹 · AI 结构化复盘为主</b>　① 顶部速览：完成率环 + 目标达成对照。② <b>AI 按本周日级数据自动生成结构化复盘</b>（重大事件/亮点/不足·现象-原因-改进/上周风险复查表/风险评估/下周建议），<b>可编辑 + 重新生成</b>，镜像你的真实周复盘 SOP。
+      ③ 规划下周为次要：复盘的"调整建议"驱动精简方向+周任务+月任务级联。④ 周级是统筹层，价值在结构化反思与风险追踪。
+    </div>
+  </main>
+</div>
+</body>
+</html>
