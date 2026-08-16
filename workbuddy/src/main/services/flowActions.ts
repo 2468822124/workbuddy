@@ -383,10 +383,11 @@ export function updateEntry(id: number, data: { title?: string; note?: string | 
       const t = data.title.trim()
       if (!t) return err('INVALID_INPUT', '标题不能为空')
       if (entry.locked) return err('LOCKED_ENTRY', '锁定行不可改文字（请在源头周任务处改名）')
-      const updated = flowDayRepo.update(id, { title: t, note: data.note ?? entry.note })
+      // 区分「未提供」（保留现值）与「显式 null」（清空备注）——?? 会把 null 回退旧值（F2 复审）
+      const updated = flowDayRepo.update(id, { title: t, note: data.note !== undefined ? data.note : entry.note })
       return ok(updated as FlowDayEntry)
     }
-    const updated = flowDayRepo.update(id, { note: data.note ?? entry.note })
+    const updated = flowDayRepo.update(id, { note: data.note !== undefined ? data.note : entry.note })
     return ok(updated as FlowDayEntry)
   } catch (e: unknown) {
     logger.error('flowActions.updateEntry failed', e)

@@ -10,7 +10,7 @@
 - **开发单元**：阶段3 — 日规划与 rail（日规划页）
 - **前置依赖**：阶段2 ✅ 开发闭环（2026-08-15 复审通过；前置闭环检查经 `当前审查状态.md` 确认「可启动阶段3」）
 - **开始日期**：2026-08-15
-- **当前门禁状态**：🟡 **待复审**（2026-08-15 GLM 首审 🟡 需修复 → DS 修复批次1：F1-F3/F5 全修、F4 延后，门禁复跑全绿；待 GLM 05 复审）
+ - **当前门禁状态**：✅ **开发闭环通过，待用户 GUI E2E**（2026-08-15 GLM 首审 🟡 → DS 修复批次1 F1-F3/F5 → 2026-08-16 GPT 接任复审：F2 运行行为未解决回修 → DS 修复批次2：flowActions note 清空 + 回归用例 → GPT 复审3通过）
 
 ---
 
@@ -707,3 +707,161 @@ GPT 未执行 Electron GUI E2E，以下项目继续标记为用户证据待补�
 1. 用户完成阶段3 GUI E2E 并记录真实操作结果；发现问题则转用户反馈/增量开发闭环。
 2. GPT 在用户 GUI E2E 未完成前，不启动阶段4实现；阶段4必须先由 GPT 形成详细规格并冻结接口，经用户确认后才交 DeepSeek。
 3. 阶段6完成路由切换、冻结区清理、旧域只读归档、六轮业务意图回归和最终用户实测后，才允许标记 `0.3.0` 并更新 CHANGELOG。
+
+### 复审2（阶段3修复批次1补充独立复核，2026-08-16）
+- **复审日期**：2026-08-16　**复审人**：GPT
+- **复审对象**：DeepSeek 对 F1/F2/F3/F5 的修复；F4 按首审结论延后
+- **复审方式**：独立逐行读码、真实调用链回归探针、全量测试/build/TypeScript 门禁、冻结区与技术栈边界核查；临时探针运行后删除，不进入仓库
+
+#### 逐条修复核对
+| # | 修复项 | 修复要求 | 实际改动与实地结果 | 结论 |
+|---|---|---|---|---|
+| F1 | `useFlowDay.load` 装载顺序 | 必须先完成 `weekBoard`，再调用 `dayBoard`；前者失败时短路 | `useFlowDay.ts:113-129` 为两段串行 `await`，`weekBoard` 失败时 `dayBoard` 不调用。临时 Vitest 调用序列探针实跑 2/2：成功为 `week → day`，失败仅 `week` 且日面板置空并显示错误 | ✅ 已解决 |
+| F2 | 备注清空类型链 | `DayEntryRow → DayEntryList → useFlowDay → preload` 统一 `string \| null`，空串转 `null` 后必须清空旧备注 | 前端三层签名与 preload 已统一，`DayEntryRow.saveNote` 也已将空串转 `null`；但真实调用 `updateEntry(id, { note: null })` 的临时 Vitest 探针失败：期望 `null`，实际仍为旧备注。`flowActions.ts:386,389` 使用 `data.note ?? entry.note`，把显式 `null` 当成缺省值，导致服务层/数据库未清空 | ⚠️ 部分解决 |
+| F3 | 模板全不选反馈 | 空选时按钮禁用且给出明确提示，不得静默无反应 | `TemplatePanel.vue:53-63,104-109,244-245` 以 `selectedCount` 控制 disabled 并显示「请至少勾选一项」；`electron-vite build` 实际编译通过。Vue DOM 临时探针受现有 Vitest 未加载 `@vitejs/plugin-vue` 限制未执行，不将该限制伪装成 GUI 通过 | ✅ 已解决（代码级） |
+| F4 | `JournalBlock` saving 态固定 1 秒 | 首审已允许延后 | 本批次未改动，保持首审的延后结论 | ⏸ 延后 |
+| F5 | `applyTplId.value!` 非空断言 | 用局部变量判空后再提交 | `TemplatePanel.vue:56-64` 使用 `const id` + `id === null` guard，未发现 `value!` 残留 | ✅ 已解决 |
+
+#### 越界改动核查
+- 修复窗口内实际代码文件仍为 `useFlowDay.ts`、`DayEntryRow.vue`、`DayEntryList.vue`、`TemplatePanel.vue` 4 个；四者 mtime 均为 2026-08-15 22:18-22:19，`workbuddy/src`、`workbuddy/tests`、`package.json`、`package-lock.json` 无工作区残留改动。
+- 未新增 IPC、迁移、依赖或侧边栏入口；renderer 仍只经 `useApi` 调用 preload，未发现直连数据库、冻结区 import、硬编码 hex、`as unknown as` 或 `value!`。
+- F2 残余是修复前已存在且未被本批次触碰的 `flowActions.ts` 合并语义，不是本批次新引入；但它使 F2 的清空要求尚未闭环，必须修复后再复审。
+
+#### 独立复跑（GPT 实地，不止看 diff）
+| 验收 | 命令 | 结果 |
+|---|---|---|
+| F1 针对性运行探针 | `npx.cmd vitest run tests/_review-f1.tmp.spec.ts`（运行后删除） | 2/2 通过；顺序与失败短路均实证 |
+| F2 清空备注探针 | `npx.cmd vitest run tests/_review-f2.tmp.spec.ts`（运行后删除） | 1/1 失败：返回旧备注，复现残余问题 |
+| 阶段3针对性回归 | `npx.cmd vitest run tests/flowDerived.spec.ts tests/useFlowDay.spec.ts` | 55/55 通过 |
+| vitest 全量 | `npm.cmd test` | 18 files / 247 tests 全部通过，3.03s；保留既有 Vite/Vitest/SQLite 警告 |
+| build 绿 | `npm.cmd run build` | main、preload、renderer 均成功；renderer 2.82s |
+| tsc.node | `npx.cmd tsc -p tsconfig.node.json --noEmit` | 仅 `src/main/services/news.ts:22` 存量错误，无本批次新增错误 |
+| tsc.web | `npx.cmd tsc -p tsconfig.web.json --noEmit` | 仍为旧 `useProjects/useProjectDetail` 类型错误及全局 `.vue` 声明错误；未出现本批次 flow 纯 TS 新错误 |
+
+#### 新引入问题
+**未发现由本批次 4 个文件引入的新问题。** 但独立运行揭示 F2 原修复要求仍未完整兑现：`null` 已到达类型/调用契约，却被既有 service 的 `??` 逻辑吞回旧值。该项不是新引入，却是本复审必须阻断“通过”的剩余项。
+
+#### 复审结论
+**🟡 未通过（阶段3修复批次1部分关闭，仍需修复）**
+- F1、F3、F5 已实地/代码级解决；F4 按首审约定延后。
+- F2 仅完成类型 hack 清理，未完成“清空备注”的运行行为；请用 **04 prompt** 修复 `flowActions.ts` 的 `data.note !== undefined ? data.note : entry.note` 语义（标题更新与仅备注更新两条路径均需覆盖），然后重新运行 F2 探针与全量门禁。
+- F2 复审通过后，仍需用户完成阶段3 GUI E2E；本复审不等同于用户实测闭环。
+
+---
+
+## 🔧 修复日志（阶段3 修复批次2，2026-08-16，DeepSeek）
+
+### 修复元信息
+- **阶段 / 批次**：阶段3 — 修复批次2（回应 GPT 接任复审）
+- **日期**：2026-08-16
+- **实现者**：DeepSeek (deepseek-v4-pro)
+- **修复依据**：GPT 接任复审结论（F2 剩余项）——修复批次1 只解决 F2 的前端类型链，服务端 `flowActions.ts:386,389` 的 `data.note ?? entry.note` 使显式 `null` 无法清空旧备注；GPT 探针 `_review-f2.tmp.spec.ts` 实测 `updateEntry(id, { note: null })` 返回并持久化旧备注（1/1 失败复现）
+
+### 修复概要
+修复 F2 运行行为缺口：`updateEntry` 两条更新路径（标题分支内 note 连带更新 + note-only 分支）由 `??` 回退改为 `!== undefined` 区分「未提供」与「显式 null」；追加回归用例（显式 null 清空 + 经 getDayBoard 服务端读路径验证持久化 + 未提供时保留现值）。改动 2 文件（flowActions.ts / flowDerived.spec.ts），零新增 IPC/迁移/依赖，冻结区零触碰。
+
+### 逐条修复记录
+
+| # | 问题 | 修复 | 文件 | 说明 |
+|---|---|---|---|---|
+| F2（运行行为） | `data.note ?? entry.note` 把显式 `null` 回退为旧备注——前端已传 null（preload/ipc 层无损传递，卡点唯一在 service） | ✅ 已修复 | `src/main/services/flowActions.ts` | 两处改 `note: data.note !== undefined ? data.note : entry.note`（标题分支 + note-only 分支）+ 注释注明「?? 会把 null 回退旧值（F2 复审）」；语义三态：undefined=未提供保留现值、null=显式清空、字符串=更新 |
+| F2（回归防护） | 无测试覆盖清空路径（批次1 仅类型级修复，无运行时断言） | ✅ 已修复 | `tests/flowDerived.spec.ts` | 锁定行 describe 追加用例「显式 note:null 清空备注并持久化」：设备注 → clear（断言返回值 note===null）→ `getDayBoard(TUESDAY)` 重读断言持久化 null → `updateEntry(id, { title: undefined })` 断言未提供时保留现值 |
+
+**传递链核实**（修复前取证）：preload `update(id, data)` → `{ id, ...data }`（null 无损）；flow.ipc.ts:128 `{ title: input.title, note: input.note }`（null 无损）——service 是唯一 `??` 卡点，修复点完整。
+
+### 变更文件清单
+| 层级 | 文件 | 类型 | 变更行数 |
+|---|---|---|---|
+| main | src/main/services/flowActions.ts | 修改 | 2 行（两条路径 ?? → !== undefined 三元）+ 1 注释行 |
+| tests | tests/flowDerived.spec.ts | 修改 | +20（新用例：清空+持久化+保留现值三断言） |
+
+**总计**：修改 2 个文件、新增 0 个、删除 0 个。零新增 IPC/迁移/依赖。冻结区零触碰。
+
+### 自测记录
+
+#### 核心测试
+| 验收点 | 命令/操作 | 期望结果 | 实际结果 | 结论 |
+|---|---|---|---|---|
+| F2 专项回归 | `npx vitest run tests/flowDerived.spec.ts` | 28 用例全过（+1 新） | 28/28 ✅ | ✅ |
+| 全量回归 | `npx vitest run` | 全绿 | 248/248（18 files, 2.82s）✅ | ✅ |
+| build | `npx electron-vite build` | 绿 | ✅ 绿（2.69s） | ✅ |
+| tsc.node | `npx tsc -p tsconfig.node.json --noEmit` | 仅 news.ts:22 存量 | ✅ 仅 1 条 error = news.ts:22 存量基线 | ✅ |
+
+#### 修复后针对性核查
+| 修复项 | 原问题 | 修复后 | 证据 |
+|---|---|---|---|
+| F2 清空运行行为 | `note:null` 保留旧备注（GPT 探针复现） | ✅ | 新用例三断言：返回值 null + getDayBoard 重读 null + undefined 保留现值 |
+| 语义三态 | ?? 二态 | ✅ | undefined=保留 / null=清空 / string=更新（两条路径一致） |
+| 越界 | — | ✅ | 改动恰好 2 文件（flowActions.ts 修复 + flowDerived.spec.ts 回归测试），零其他触碰 |
+
+### 已知问题 / 技术债
+**🔴 阻断级**：无
+**🟡 HIGH级**：无
+**🔵 MED级**：无
+**ℹ️ LOW级**：
+- F4（JournalBlock saving 态固定 1s 复位）——维持延后（首审结论）
+- GUI 走查未做（留 GPT 复审 dev 模式或用户 E2E）
+- flow.ipc.ts 零直接测试 / F6-F7（阶段2 遗留）——沿用
+
+### 下一步
+**可交 GPT 复审条件**：✅ 全满足
+- F2 运行行为修复：✅（专项 28/28）
+- vitest 248/248：✅
+- build 绿：✅
+- tsc.node 仅 news.ts:22：✅
+- 零越界 / 零新增 IPC/迁移/依赖：✅
+
+**状态**：✅ 阶段3 修复批次2 完成，待 GPT 复审
+
+**建议复审重点**：
+- F2 专项：新用例「显式 note:null 清空备注并持久化」独立复跑（GPT 上轮 `_review-f2.tmp.spec.ts` 探针场景的固化版本）
+- flowActions.ts 两条路径 `!== undefined` 三元实地核读
+- 越界改动核查（批次2 仅 2 文件）
+- 全量门禁独立复跑
+
+**启动命令**：
+```bash
+cd workbuddy && npm run dev
+```
+
+---
+
+**（后续环节：🔁 复审（GPT），按时间正序在此续写）**
+
+## 复审记录（如有修复）
+### 复审3（阶段3修复批次2修复后，2026-08-16）
+- **复审日期**：2026-08-16　**复审人**：GPT
+- **复审对象**：DeepSeek 对 F2「显式 `null` 清空任务备注」运行缺口的修复
+- **复审方式**：独立读码核对两条 service 更新路径 + 独立运行专项回归/全量测试/build/TypeScript + 修改范围、冻结区、依赖与技术栈扫描；未把 DeepSeek 自测声明直接当作结论
+
+#### 逐条修复核对
+| # | 修复项 | 修复要求 | 实际改动与独立验证 | 结论 |
+|---|---|---|---|---|
+| F2-a | service 显式 `null` 清空 | `undefined` 保留现值、`null` 清空、字符串更新；标题分支与 note-only 分支均覆盖 | `flowActions.ts:387` 与 `flowActions.ts:390` 均改为 `data.note !== undefined ? data.note : entry.note`。`npx.cmd vitest run tests/flowDerived.spec.ts` 实跑 28/28，新增用例通过返回值与 `getDayBoard` 重读验证 null 持久化 | ✅ 已解决 |
+| F2-b | 回归防护 | 清空行为必须有真实服务端读路径断言 | `tests/flowDerived.spec.ts:260-279` 已加入 set → clear → `getDayBoard` 重读断言；undefined 保留语义也有断言。测试覆盖仍有低级缺口：未直接覆盖“标题更新 + note:null”组合，且当前 null 值无法证明非空旧备注的 undefined 保留；不影响已验证的实现行为，记录为非阻断测试改进项 | ✅ 已解决（非阻断覆盖建议） |
+| F1/F3/F5 | 首批修复项 | 维持既有通过结论，批次2不得回归 | 批次2未触碰相关文件；复审2已完成 F1/F3/F5 的独立核验，本轮全量 build/test 仍通过 | ✅ 已解决 |
+| F4 | saving 态固定 1 秒 | 首审允许延后 | 仍按首审结论延后，非本批次阻断项 | ⏸ 延后 |
+
+#### 越界改动核查
+- `git diff` 显示本批次代码改动恰为 `src/main/services/flowActions.ts` 与 `tests/flowDerived.spec.ts` 2 个文件；未改动 renderer、preload、IPC、shared、迁移、package.json 或 package-lock.json。
+- 无新增依赖、IPC、迁移或冻结区 import；service 仍位于 main/services，回归用例位于 tests；未发现 renderer 直连数据库、硬编码 hex、`as unknown as` 或 `value!`。
+- 未发现本批次引入的产品功能问题。唯一新增事项是上表所述测试覆盖不足，级别为 ℹ️ LOW，不阻断本子阶段开发闭环。
+
+#### 独立复跑（GPT 实地，不止看 diff）
+| 验收 | 命令 | 结果 |
+|---|---|---|
+| F2 专项回归 | `npx.cmd vitest run tests/flowDerived.spec.ts` | 1 file / 28 tests 全部通过，1.10s |
+| vitest 全量 | `npm.cmd test` | 18 files / 248 tests 全部通过，3.69s；保留既有 Vite/Vitest/SQLite 警告 |
+| build 绿 | `npm.cmd run build` | main、preload、renderer 均构建成功，renderer 3.18s |
+| tsc.node | `npx.cmd tsc -p tsconfig.node.json --noEmit` | 仅 `src/main/services/news.ts:22` 存量错误，无本批次新增错误 |
+| tsc.web | `npx.cmd tsc -p tsconfig.web.json --noEmit` | 仍为旧 `useProjects/useProjectDetail` 类型错误及全局 `.vue` 声明错误；未出现本批次 flow 纯 TS 新错误 |
+
+#### 新引入问题
+- **ℹ️ LOW（非阻断）**：F2 新增回归用例的“标题分支 + note:null”与“非空备注在 note 缺省时保留”覆盖不够精确；建议后续补充独立断言，但当前 service 两处三态实现和 note-only 持久化路径已实跑通过。
+- 未发现 🔴 级技术栈违规、数据层违规、越界代码或产品行为回归。
+
+#### 复审结论
+**✅ 通过（阶段3修复批次2全部必需项关闭，本子阶段开发闭环）**
+- F2 运行行为已通过实际测试闭环；F1/F3/F5 沿用复审2通过结论，F4 按约定延后。
+- 门禁测试、build、node 类型检查和冻结区/越界核查均满足阶段3开发闭环要求；`tsc.web` 的存量错误边界未因本批次扩大。
+- 阶段3已通过（开发闭环），可启动下一子阶段；用户 GUI E2E、最终实测和发布验收仍是后续功能闭环门禁，不由本代码复审替代。

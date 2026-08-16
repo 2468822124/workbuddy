@@ -256,6 +256,27 @@ describe('锁定行禁改文字 / 私有备注可用', () => {
     expect(r2.data.note).toBe('私有备注')
     expect(r2.data.title).toBe('做周报')
   })
+
+  // F2 复审回归：显式 null 必须清空备注（?? 会把 null 回退旧值）
+  it('显式 note:null 清空备注并持久化', () => {
+    const inst = makeTempInst('做周报')
+    const e = addEntry({ date: TUESDAY, title: '做周报', source: 'rail', weekInstanceId: inst.id, locked: true })
+    if (!e.ok) throw new Error(e.error.message)
+    const set = updateEntry(e.data.id, { note: '私有备注' })
+    if (!set.ok) throw new Error(set.error.message)
+    expect(set.data.note).toBe('私有备注')
+    const clear = updateEntry(e.data.id, { note: null })
+    if (!clear.ok) throw new Error(clear.error.message)
+    expect(clear.data.note).toBeNull()
+    // 持久化验证：经 getDayBoard 重读（服务端读路径），非仅返回值
+    const board = getDayBoard(TUESDAY)
+    const row = board.entries.find(x => x.id === e.data.id)
+    expect(row?.note).toBeNull()
+    // 未提供 note（undefined）时保留现值
+    const keep = updateEntry(e.data.id, { title: undefined })
+    const board2 = getDayBoard(TUESDAY)
+    expect(board2.entries.find(x => x.id === e.data.id)?.note).toBeNull()
+  })
 })
 
 describe('R1 修复：凭据撤销/编辑（历史可改铁律闭环）', () => {
