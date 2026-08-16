@@ -1,7 +1,7 @@
 # 变更记录（CHANGELOG）
 
-> **维护方**：GLM　**格式**：[Keep a Changelog](https://keepachangelog.com/) 风格，倒序（最新在上）。每条对应一个已关闭的 CR（或构建期阶段），含 CR 号 + 严重度 + 日期。
-> **版本语义**：`MAJOR.MINOR.PATCH`，bump 规则见 `项目规范/变更闭环规则.md §5`（🔵→PATCH / 🟡→MINOR / 🔴或新功能→MAJOR）。
+> **维护方**：GPT　**格式**：[Keep a Changelog](https://keepachangelog.com/) 风格，倒序（最新在上）。每条对应一个已关闭的 CR（或构建期阶段），含 CR 号 + 严重度 + 日期。
+> **版本语义**：`MAJOR.MINOR.PATCH`，bump 规则见 `规范类/变更闭环规则.md §5`（🔵→PATCH / 🟡→MINOR / 🔴或新功能→MAJOR）。
 > **起点**：Day-1 GA = `0.1.0`。
 
 ---
