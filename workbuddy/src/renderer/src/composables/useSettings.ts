@@ -44,6 +44,11 @@ export function useSettings() {
     return api.data.import()
   }
 
+  // 阶段6：旧表归档（设置页显式触发；Result 含 counts/路径，错误经反馈条展示）
+  async function archiveLegacy() {
+    return api.archive.legacy()
+  }
+
   async function refreshNews() {
     const r = await api.news.refresh()
     return r.ok && r.data?.ok
@@ -51,5 +56,5 @@ export function useSettings() {
 
   onMounted(load)
 
-  return { settings, loading, testResult, testing, save, testLlm, exportData, importData, refreshNews }
+  return { settings, loading, testResult, testing, save, testLlm, exportData, importData, refreshNews, archiveLegacy }
 }

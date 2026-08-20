@@ -4,11 +4,19 @@ import AppIcon from '@/components/AppIcon.vue'
 import DayEntryRow from './DayEntryRow.vue'
 import type { DayBoardEntry } from '@shared/flowTypes'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   entries: DayBoardEntry[]
   /** 最小挪动日（今天，历史日允许挪向今天） */
   minDate: string
-}>()
+  /** 阶段4：今日页专用标题（/flow/day 缺省用「当日任务」） */
+  title?: string
+  emptyTitle?: string
+  emptyHint?: string
+}>(), {
+  title: '当日任务',
+  emptyTitle: '今天还没有任务',
+  emptyHint: '手动添加 / 从 rail 选取 / 套用模板',
+})
 
 const emit = defineEmits<{
   add: [title: string]
@@ -35,6 +43,13 @@ function submitAdd(): void {
   newTitle.value = ''
   showAdd.value = false
 }
+
+/** 阶段4：今日页 Hero「新待办」按钮聚焦添加行（defineExpose 供父组件调用） */
+function openAdd(): void {
+  showAdd.value = true
+}
+
+defineExpose({ openAdd })
 </script>
 
 <template>
@@ -42,13 +57,15 @@ function submitAdd(): void {
     <header class="card-head">
       <div class="head-title">
         <AppIcon name="CheckSquare" :size="18" />
-        <h2>当日任务</h2>
+        <h2>{{ title }}</h2>
         <span class="count-chip">{{ entries.length }}</span>
       </div>
       <button v-if="!showAdd" class="add-btn" @click="showAdd = true">
         <AppIcon name="Plus" :size="16" />
         <span>添加任务</span>
       </button>
+      <!-- 阶段4：头部扩展位（今日页「去日规划」入口） -->
+      <slot name="head-extra" />
     </header>
 
     <!-- 添加行 -->
@@ -106,8 +123,8 @@ function submitAdd(): void {
     <!-- 空态 -->
     <div v-if="!entries.length && !showAdd" class="empty">
       <span class="party">☀️</span>
-      <p>今天还没有任务</p>
-      <p class="hint">手动添加 / 从 rail 选取 / 套用模板</p>
+      <p>{{ emptyTitle }}</p>
+      <p class="hint">{{ emptyHint }}</p>
     </div>
   </section>
 </template>

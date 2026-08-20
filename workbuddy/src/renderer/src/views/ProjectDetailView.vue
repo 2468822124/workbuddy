@@ -11,7 +11,7 @@ import TaskRow from '@/components/project/TaskRow.vue'
 const route = useRoute()
 const router = useRouter()
 const id = route.params.id as string
-const { project, todos, notFound, load, updateProject, removeProject, createTodo, updateTodo, deleteTodo, toggleTodo } = useProjectDetail(id)
+const { project, todos, notFound, error, info, load, updateProject, removeProject, createTodo, updateTodo, deleteTodo, toggleTodo, addToday } = useProjectDetail(id)
 
 const showEdit = ref(false)
 const showNewTask = ref(false)
@@ -83,6 +83,10 @@ function onAddTask() {
 
     <ProjectForm :project="project" :show="showEdit" @close="showEdit = false" @save="onEditSave" />
 
+    <!-- 阶段4：加入今日 / 动作失败反馈条 -->
+    <div v-if="error" class="banner err"><AppIcon name="AlertCircle" :size="14" />{{ error }}</div>
+    <div v-else-if="info" class="banner ok"><AppIcon name="Check" :size="14" />{{ info }}</div>
+
     <!-- Tasks -->
     <BaseCard>
       <div class="card-head">
@@ -107,6 +111,7 @@ function onAddTask() {
           @toggle="toggleTodo"
           @update="(tid, d) => updateTodo(tid, d)"
           @delete="(tid) => deleteTodo(tid)"
+          @add-today="(tid) => addToday(tid)"
         />
       </div>
     </BaseCard>
@@ -155,6 +160,9 @@ h2 { font-size: 16px; font-weight: var(--fw-semibold); color: var(--text-strong)
 .save { background: var(--ok); border: none; border-radius: var(--r-sm); cursor: pointer; color: var(--text-on-primary); padding: 8px 10px; display: grid; place-items: center; }
 
 .task-list { display: flex; flex-direction: column; gap: var(--s1); }
+.banner { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s4); border-radius: var(--r-md); font-size: var(--fs-small); }
+.banner.err { background: var(--danger-faint); color: var(--danger); }
+.banner.ok { background: var(--ok-soft); color: var(--ok); }
 .empty-hint { text-align: center; color: var(--text-faint); padding: var(--s8); font-size: var(--fs-small); }
 .back-btn { font-family: inherit; font-size: var(--fs-body); color: var(--accent); background: none; border: none; cursor: pointer; font-weight: var(--fw-medium); }
 .back-btn:hover { color: var(--accent-press); }

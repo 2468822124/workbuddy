@@ -9,9 +9,9 @@ const route = useRoute()
   <div class="layout">
     <AppSidebar />
     <main class="main">
-      <!-- key=path：/planning/:level 切换 level 时强制重建组件（setup 重跑），
-           修复 vue-router 组件复用导致的 level 派生量冻结（用户反馈3 F3-1）。
-           用 path 而非 fullPath：同 level 内翻期（date 在 query）不重建、不丢草稿。 -->
+      <!-- key=path：flow 页之间切换时强制重建组件（setup 重跑），
+           修复 vue-router 组件复用导致的期派生量冻结（原 /planning/:level 的 F3-1 修复沿用到 flow 路由）。
+           用 path 而非 fullPath：同页内翻期（date 在 query）不重建、不丢草稿。 -->
       <router-view :key="route.path" />
     </main>
   </div>

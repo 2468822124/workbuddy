@@ -1,8 +1,7 @@
 import { app, BrowserWindow, Menu, session } from 'electron'
-import { initDb, closeDb } from './db/connection'
+import { initDb, closeDb, getDbMode } from './db/connection'
 import { runMigrations } from './db/migrate'
 import { settingsRepo } from './db/repositories/settingsRepo'
-import { templateRepo } from './db/repositories/templateRepo'
 import { createWindow, getMainWindow } from './window'
 import { registerAllIpc } from './ipc'
 import { maybeRunMorningRoutine } from './services/morning'
@@ -57,24 +56,28 @@ if (!gotLock) {
     }
 
     try {
-      // DB
+      // DB（阶段6修复批次 · F5：损坏/只读时 initDb 不再 throw——
+      // readonly 跳过全部写入任务、unavailable 进入保护模式；两者均继续注册 IPC）
       initDb()
-      try {
-        runMigrations()
-      } catch (e) {
-        logger.error('Migration failed, entering safe mode:', e)
-      }
-      settingsRepo.seedDefaults()
-      templateRepo.seedDefaults()
+      if (getDbMode() === 'normal') {
+        try {
+          runMigrations()
+        } catch (e) {
+          logger.error('Migration failed, entering safe mode:', e)
+        }
+        settingsRepo.seedDefaults()
 
-      // 子阶段5：周期性提醒（周日→做周统筹；月末→做月指导）。幂等；失败不阻断启动
-      try {
-        ensurePeriodicReminders(new Date().toISOString().slice(0, 10))
-      } catch (e) {
-        logger.warn('ensurePeriodicReminders failed:', e)
+        // 子阶段5：周期性提醒（周日→做周统筹；月末→做月指导）。幂等；失败不阻断启动
+        try {
+          ensurePeriodicReminders(new Date().toISOString().slice(0, 10))
+        } catch (e) {
+          logger.warn('ensurePeriodicReminders failed:', e)
+        }
+      } else {
+        logger.warn('DB not in normal mode: skipping migrations/seed/reminders')
       }
 
-      // IPC
+      // IPC（registerAllIpc 内部按模式守卫：readonly → 写通道 READ_ONLY；unavailable → 全通道 DB_UNAVAILABLE）
       registerAllIpc()
     } catch (e) {
       logger.error('Startup sequence failed:', e)

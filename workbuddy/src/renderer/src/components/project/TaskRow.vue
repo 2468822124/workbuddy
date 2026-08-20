@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
-import type { Todo } from '@shared/types'
+import type { ProjectTask } from '@shared/types'
 
-const props = defineProps<{ todo: Todo }>()
+const props = defineProps<{ todo: ProjectTask }>()
 const emit = defineEmits<{
   toggle: [id: string]
   update: [id: string, data: { content?: string; planDate?: string | null }]
   delete: [id: string]
+  addToday: [id: string]
 }>()
 
 const editing = ref(false)
@@ -62,6 +63,10 @@ function cancelDelete() {
     </template>
 
     <div class="actions">
+      <!-- 阶段4：加入今日 → 生成今日投影（服务端幂等去重） -->
+      <button v-if="!editing" class="ac" title="加入今日" @click="$emit('addToday', todo.id)">
+        <AppIcon name="CornerUpRight" :size="14" />
+      </button>
       <button v-if="!editing" class="ac" @click="startEdit"><AppIcon name="Pencil" :size="14" /></button>
       <template v-if="!confirmDelete">
         <button class="ac del" @click="requestDelete"><AppIcon name="Trash2" :size="14" /></button>

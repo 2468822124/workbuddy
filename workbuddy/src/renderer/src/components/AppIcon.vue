@@ -7,7 +7,7 @@ import { Sparkles, LayoutGrid, FolderKanban, Library, Dumbbell, Settings,
   ClipboardList, NotebookPen, Bold, Italic, Heading, ListChecks, List, Link,
   Eye, EyeOff, Pencil, Trash2, Download, Upload,
   SkipForward, CalendarDays, MoveRight, Target, Repeat, CalendarRange,
-  ChevronUp, ChevronDown, Info, CalendarCheck, Lock, Copy } from 'lucide-vue-next'
+  ChevronUp, ChevronDown, Info, CalendarCheck, Lock, Copy, ExternalLink } from 'lucide-vue-next'
 
 const icons = {
   Sparkles, LayoutGrid, FolderKanban, Library, Dumbbell, Settings,
@@ -17,7 +17,7 @@ const icons = {
   ClipboardList, NotebookPen, Bold, Italic, Heading, ListChecks, List, Link,
   Eye, EyeOff, Pencil, Trash2, Download, Upload,
   SkipForward, CalendarDays, MoveRight, Target, Repeat, CalendarRange,
-  ChevronUp, ChevronDown, Info, CalendarCheck, Lock, Copy,
+  ChevronUp, ChevronDown, Info, CalendarCheck, Lock, Copy, ExternalLink,
 }
 
 const props = withDefaults(defineProps<{

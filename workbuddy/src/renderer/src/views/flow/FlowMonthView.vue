@@ -7,7 +7,19 @@ import type { FlowMonthGoal } from '@shared/flowTypes'
 
 const route = useRoute()
 const router = useRouter()
-const fm = useFlowMonth()
+// 阶段6修复批次 · F2：顶层解构 refs（模板不解包普通对象属性上的 ref → 白屏根因）
+const {
+  month,
+  goals,
+  historyUnclosed,
+  loading,
+  error,
+  info,
+  load,
+  save,
+  closeGoal,
+  deleteGoal,
+} = useFlowMonth()
 
 function todayStr(): string {
   const d = new Date()
@@ -25,11 +37,11 @@ watch(
   () => route.query.month,
   q => {
     const target = parseMonthQuery(q, today)
-    if (target !== fm.month.value) fm.load(target)
+    if (target !== month.value) load(target)
   },
 )
 
-onMounted(() => fm.load(parseMonthQuery(route.query.month, today)))
+onMounted(() => load(parseMonthQuery(route.query.month, today)))
 
 // 新建 / 改名 / 关闭 / 删除
 const adding = ref(false)
@@ -45,7 +57,7 @@ const showHistory = ref(false)
 function submit(): void {
   const t = title.value.trim()
   if (!t) return
-  fm.save(t)
+  save(t)
   title.value = ''
   adding.value = false
 }
@@ -58,7 +70,7 @@ function startEdit(g: FlowMonthGoal): void {
 function saveEdit(g: FlowMonthGoal): void {
   const t = editTitle.value.trim()
   if (!t) return
-  fm.save(t, g.id)
+  save(t, g.id)
   editingId.value = null
 }
 </script>
@@ -66,27 +78,27 @@ function saveEdit(g: FlowMonthGoal): void {
 <template>
   <div class="page">
     <div class="month-nav">
-      <button class="nav-btn" title="上一月" @click="navigate(shiftMonth(fm.month, -1))">
+      <button class="nav-btn" title="上一月" @click="navigate(shiftMonth(month, -1))">
         <AppIcon name="ChevronLeft" />
       </button>
-      <button v-if="fm.month !== today.slice(0, 7)" class="nav-btn today-btn" title="回到本月" @click="navigate(today.slice(0, 7))">
+      <button v-if="month !== today.slice(0, 7)" class="nav-btn today-btn" title="回到本月" @click="navigate(today.slice(0, 7))">
         本月
       </button>
-      <div class="label">{{ monthLabel(fm.month) }}</div>
-      <button class="nav-btn" title="下一月" @click="navigate(shiftMonth(fm.month, 1))">
+      <div class="label">{{ monthLabel(month) }}</div>
+      <button class="nav-btn" title="下一月" @click="navigate(shiftMonth(month, 1))">
         <AppIcon name="ChevronRight" />
       </button>
     </div>
 
-    <div v-if="fm.error" class="feedback error">{{ fm.error }}</div>
-    <div v-else-if="fm.info" class="feedback info">{{ fm.info }}</div>
+    <div v-if="error" class="feedback error">{{ error }}</div>
+    <div v-else-if="info" class="feedback info">{{ info }}</div>
 
     <section class="card">
       <header class="card-head">
         <div class="head-title">
           <AppIcon name="Target" :size="18" />
           <h2>月目标</h2>
-          <span class="count-chip">{{ fm.goals.length }}</span>
+          <span class="count-chip">{{ goals.length }}</span>
         </div>
         <button class="icon-btn" :title="adding ? '收起' : '新建月目标'" @click="adding = !adding">
           <AppIcon :name="adding ? 'ChevronUp' : 'Plus'" />
@@ -99,13 +111,13 @@ function saveEdit(g: FlowMonthGoal): void {
       </form>
 
       <!-- 超过 5 个 → 软提示（非阻断） -->
-      <p v-if="fm.goals.length > 5" class="soft-hint">
+      <p v-if="goals.length > 5" class="soft-hint">
         <AppIcon name="Info" :size="14" />
         本月目标超过 5 个，建议精简聚焦
       </p>
 
-      <ul v-if="fm.goals.length" class="goal-list">
-        <li v-for="g in fm.goals" :key="g.id" class="goal-row" :class="{ closed: g.closedAt !== null }">
+      <ul v-if="goals.length" class="goal-list">
+        <li v-for="g in goals" :key="g.id" class="goal-row" :class="{ closed: g.closedAt !== null }">
           <template v-if="editingId === g.id">
             <input v-model="editTitle" class="input" @keyup.enter="saveEdit(g)" @keyup.esc="editingId = null" />
             <button class="tiny-btn primary" :disabled="!editTitle.trim()" @click="saveEdit(g)">保存</button>
@@ -117,11 +129,11 @@ function saveEdit(g: FlowMonthGoal): void {
             <div class="goal-actions">
               <button class="tiny-btn" :disabled="g.closedAt !== null" @click="startEdit(g)">改名</button>
               <template v-if="confirmId === `close-${g.id}`">
-                <button class="tiny-btn danger solid" @click="fm.closeGoal(g); confirmId = null">确认关闭</button>
+                <button class="tiny-btn danger solid" @click="closeGoal(g); confirmId = null">确认关闭</button>
                 <button class="tiny-btn" @click="confirmId = null">取消</button>
               </template>
               <template v-else-if="confirmId === `del-${g.id}`">
-                <button class="tiny-btn danger solid" @click="fm.deleteGoal(g.id); confirmId = null">确认删除</button>
+                <button class="tiny-btn danger solid" @click="deleteGoal(g.id); confirmId = null">确认删除</button>
                 <button class="tiny-btn" @click="confirmId = null">取消</button>
               </template>
               <template v-else>
@@ -143,18 +155,18 @@ function saveEdit(g: FlowMonthGoal): void {
     </section>
 
     <!-- 历史未关闭目标（默认收进展开区；无自动结算，跨月滚动） -->
-    <section v-if="fm.historyUnclosed.length" class="card history">
+    <section v-if="historyUnclosed.length" class="card history">
       <button class="history-toggle" @click="showHistory = !showHistory">
         <AppIcon :name="showHistory ? 'ChevronDown' : 'ChevronRight'" :size="16" />
-        <span>历史未关闭目标（{{ fm.historyUnclosed.length }}）</span>
+        <span>历史未关闭目标（{{ historyUnclosed.length }}）</span>
       </button>
       <ul v-if="showHistory" class="goal-list">
-        <li v-for="g in fm.historyUnclosed" :key="g.id" class="goal-row closed">
+        <li v-for="g in historyUnclosed" :key="g.id" class="goal-row closed">
           <span class="goal-title">{{ g.title }}</span>
           <span class="badge month">{{ g.month }}</span>
           <div class="goal-actions">
             <template v-if="histConfirmId === g.id">
-              <button class="tiny-btn danger solid" @click="fm.deleteGoal(g.id); histConfirmId = null">确认删除</button>
+              <button class="tiny-btn danger solid" @click="deleteGoal(g.id); histConfirmId = null">确认删除</button>
               <button class="tiny-btn" @click="histConfirmId = null">取消</button>
             </template>
             <button v-else class="tiny-btn danger" @click="histConfirmId = g.id">删除</button>

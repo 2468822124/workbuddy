@@ -2,7 +2,9 @@ import { flowFixedRepo } from '../db/repositories/flowFixedRepo'
 import { flowWeekRepo } from '../db/repositories/flowWeekRepo'
 import { flowDayRepo } from '../db/repositories/flowDayRepo'
 import { flowVoucherRepo } from '../db/repositories/flowVoucherRepo'
-import { getWeekStart } from '@shared/period'
+import { projectTaskRepo } from '../db/repositories/projectTaskRepo'
+import { getWeekStart, addDays } from '@shared/period'
+import { completionOf, InstanceAggregate } from './flowDerived'
 import { ok, err, Result } from '../lib/result'
 import { logger } from '../lib/logger'
 import {
@@ -165,14 +167,52 @@ export function skipInstance(id: number): Result<FlowWeekInstance> {
   }
 }
 
-/** 复盘「转下周」：生成下周一次性周任务（显式清债），原实例保留作历史 */
+/**
+ * 复盘「转下周」：生成下周一次性周任务（显式清债），原实例保留作历史。
+ * 守卫链：NOT_FOUND → INVALID_INPUT → INVALID_ACTION（仅历史周未完成/未跳过/未完成态，
+ * 目标周=源周+7 天；目标可等于当前周[上周转本周]，仍拒绝大于当前周的未来周）
+ * → 幂等返回既有承接实例（同源同周不重复建）。
+ * 完成态与复盘一致：completionOf 复用（凭据池实时计算）。
+ */
 export function carryInstance(id: number, nextWeekStart: string): Result<FlowWeekInstance> {
   try {
     const inst = flowWeekRepo.findById(id)
     if (!inst) return err('NOT_FOUND', '周任务不存在')
     if (!isValidDate(nextWeekStart)) return err('INVALID_INPUT', 'nextWeekStart 非法日期')
+
+    const targetWeekStart = getWeekStart(nextWeekStart)
+    if (targetWeekStart !== addDays(getWeekStart(inst.weekStart), 7)) {
+      return err('INVALID_ACTION', '仅支持转到下一周')
+    }
+    // R1（复审2）：目标=当前周放行（上周未完成 → 本周清债），仅拒绝未来周（> 当前周）。
+    // 源周=当前周时目标=源周+7=未来周，天然被本守卫拒绝 → 源必须是历史周由目标守卫传递保证。
+    if (targetWeekStart > getWeekStart(todayStr())) {
+      return err('INVALID_ACTION', '仅历史周任务可转下周')
+    }
+    if (inst.skippedAt !== null) {
+      return err('INVALID_ACTION', '已跳过任务不可转下周')
+    }
+
+    // 完成态（未完成才可转）：entries+凭据聚合 → completionOf（与周面板同口径）
+    const entries = flowDayRepo.findByInstance(id)
+    const entryChecks = flowVoucherRepo.listActiveByTargets('day_entry', entries.map(e => e.id))
+    const doneEntryIds = new Set(entryChecks.filter(v => v.kind === 'check').map(v => v.targetId))
+    const instVouchers = flowVoucherRepo.listActiveByTargets('week_instance', [id])
+    const completion = completionOf({
+      inst,
+      entries,
+      manualCount: instVouchers.filter(v => v.kind === 'manual').length,
+      extraCount: instVouchers.filter(v => v.kind === 'extra').length,
+      doneEntryIds,
+    } as InstanceAggregate)
+    if (completion.done) return err('INVALID_ACTION', '已完成任务不可转下周')
+
+    // 幂等：同源同目标周已有承接实例 → 直接返回（不重复建）
+    const existing = flowWeekRepo.findActiveByCarry(id, targetWeekStart)
+    if (existing) return ok(existing)
+
     const created = flowWeekRepo.create({
-      weekStart: getWeekStart(nextWeekStart),
+      weekStart: targetWeekStart,
       origin: 'temp',
       fixedDefId: null,
       title: inst.title,
@@ -266,6 +306,13 @@ export function updateVoucher(voucherId: number, data: { occurredAt?: string; no
 // ===== 日任务行 =====
 
 const INSTANCE_SOURCES: FlowEntrySource[] = ['rail', 'habit']
+/** 阶段4：来源投影行（project=项目源 todo 投影；reminder=周期提醒打卡投影） */
+const PROJECTION_SOURCES: FlowEntrySource[] = ['project', 'reminder']
+
+/** 阶段4：来源投影行判定（挪动/跳过禁用与回写分流共用） */
+function isProjectionRow(source: FlowEntrySource): boolean {
+  return PROJECTION_SOURCES.includes(source)
+}
 
 export function addEntry(input: {
   date: string
@@ -273,7 +320,7 @@ export function addEntry(input: {
   source: FlowEntrySource
   locked?: boolean
   weekInstanceId?: number | null
-  projectId?: number | null
+  projectId?: string | null
   reminderKey?: string | null
   templateId?: number | null
   note?: string | null
@@ -294,11 +341,42 @@ export function addEntry(input: {
     } else if (weekInstanceId === undefined) {
       weekInstanceId = null
     }
+
+    // 阶段4 来源投影：去重幂等（active 已存在 → 直接返回）+ 源校验 + 墓碑复用/拦截
+    if (source === 'project' || source === 'reminder') {
+      const ref = source === 'project'
+        ? { projectId: input.projectId }
+        : { reminderKey: input.reminderKey }
+      const active = flowDayRepo.findActiveBySourceRef(input.date, source, ref)
+      if (active) return ok(active) // 重复点击「加入今日」/重复种入 → 幂等返回同一行
+
+      if (source === 'reminder') {
+        if (input.reminderKey !== 'weekly' && input.reminderKey !== 'monthly') {
+          return err('INVALID_INPUT', 'reminderKey 仅支持 weekly/monthly')
+        }
+        const tomb = flowDayRepo.findTombstoneBySourceRef(input.date, source, ref)
+        if (tomb) return err('SKIPPED_REMOVED', '该提醒今日已移出，不重复种入')
+      } else {
+        const sourceTodo = input.projectId ? projectTaskRepo.findById(input.projectId) : undefined
+        if (!sourceTodo || sourceTodo.isDeleted) return err('SOURCE_MISSING', '来源任务不存在或已删除')
+        const tomb = flowDayRepo.findTombstoneBySourceRef(input.date, source, ref)
+        if (tomb) {
+          // 移出今日后再次加入 → 复活原行（行身份稳定），标题快照刷新为源 todo 当前值
+          const revived = flowDayRepo.restore(tomb.id, { title: sourceTodo.content })
+          return ok(revived as FlowDayEntry)
+        }
+      }
+    }
+
     const entry = flowDayRepo.create({
       date: input.date,
-      title,
+      // project 行标题=源 todo 当前标题快照（展示时实时跟随源，此处仅作兜底）
+      title: source === 'project' && input.projectId
+        ? (projectTaskRepo.findById(input.projectId)?.content ?? title)
+        : title,
       source,
-      locked: input.locked ?? INSTANCE_SOURCES.includes(source),
+      // 阶段4：project/reminder 投影行服务端硬锁——忽略调用方 locked 入参（防 locked:false 绕过改名/挪动/跳过守卫）
+      locked: isProjectionRow(source) ? true : (input.locked ?? INSTANCE_SOURCES.includes(source)),
       weekInstanceId,
       projectId: input.projectId ?? null,
       reminderKey: input.reminderKey ?? null,
@@ -313,11 +391,34 @@ export function addEntry(input: {
   }
 }
 
-/** 勾选/收勾：check 凭据建/软删；完成态由派生实时重算（历史可改铁律） */
+/** 阶段4：project 投影勾选 → 回写源 todo 完成态（项目页与今日页同源，零双态） */
+function toggleProjectionCheck(entry: FlowDayEntry): Result<{ done: boolean }> {
+  if (!entry.projectId) return err('SOURCE_MISSING', '来源引用缺失')
+  const todo = projectTaskRepo.findById(entry.projectId)
+  if (!todo || todo.isDeleted) return err('SOURCE_MISSING', '来源任务不存在或已删除')
+  const updated = projectTaskRepo.toggleDone(todo.id)
+  if (!updated) return err('SOURCE_MISSING', '来源任务回写失败')
+  return ok({ done: updated.status === 'done' })
+}
+
+/** 阶段4：reminder 投影勾选 → 回写提醒源 todo（规格 §5.3：findReminderTask 集中定位，禁止任意正文匹配） */
+function toggleReminderCheck(entry: FlowDayEntry): Result<{ done: boolean }> {
+  const key = entry.reminderKey
+  if (key !== 'weekly' && key !== 'monthly') return err('SOURCE_MISSING', '提醒源标记缺失或非法')
+  const sourceTodo = projectTaskRepo.findReminderTask(entry.date, key)
+  if (!sourceTodo || sourceTodo.isDeleted) return err('SOURCE_MISSING', '提醒源待办不存在或已删除')
+  const updated = projectTaskRepo.toggleDone(sourceTodo.id)
+  if (!updated) return err('SOURCE_MISSING', '提醒源回写失败')
+  return ok({ done: updated.status === 'done' })
+}
+
+/** 勾选/收勾：project/reminder 回写源状态；其余 source 走 check 凭据池（历史可改铁律） */
 export function toggleCheckEntry(id: number): Result<{ done: boolean }> {
   try {
     const entry = flowDayRepo.findById(id)
     if (!entry) return err('NOT_FOUND', '任务行不存在')
+    if (entry.source === 'project') return toggleProjectionCheck(entry)
+    if (entry.source === 'reminder') return toggleReminderCheck(entry)
     const active = flowVoucherRepo.findActiveCheck(id)
     if (active) {
       flowVoucherRepo.softDelete(active.id)
@@ -347,12 +448,14 @@ export function removeEntry(id: number): Result<{ ok: boolean }> {
   }
 }
 
-/** 挪日（自由行直接改 date；锁定行=移除+目标日再选取的一步封装，同样落为改 date） */
+/** 挪日（自由行直接改 date；锁定行=移除+目标日再选取的一步封装，同样落为改 date）。
+ *  阶段4：project/reminder 投影行禁挪动（投影语义绑定来源与当日，错位即双态）。 */
 export function moveEntry(id: number, newDate: string): Result<FlowDayEntry> {
   try {
     if (!isValidDate(newDate)) return err('INVALID_INPUT', 'newDate 非法日期')
     const entry = flowDayRepo.findById(id)
     if (!entry) return err('NOT_FOUND', '任务行不存在')
+    if (isProjectionRow(entry.source)) return err('INVALID_ACTION', '来源投影行不可挪动')
     const updated = flowDayRepo.update(id, { date: newDate })
     return ok(updated as FlowDayEntry)
   } catch (e: unknown) {
@@ -361,11 +464,12 @@ export function moveEntry(id: number, newDate: string): Result<FlowDayEntry> {
   }
 }
 
-/** 跳过本场（免罪；多次性释放本场占位） */
+/** 跳过本场（免罪；多次性释放本场占位）。阶段4：project/reminder 投影行禁跳过。 */
 export function skipEntry(id: number): Result<FlowDayEntry> {
   try {
     const entry = flowDayRepo.findById(id)
     if (!entry) return err('NOT_FOUND', '任务行不存在')
+    if (isProjectionRow(entry.source)) return err('INVALID_ACTION', '来源投影行不可跳过')
     const updated = flowDayRepo.update(id, { skippedAt: todayStr() })
     return ok(updated as FlowDayEntry)
   } catch (e: unknown) {

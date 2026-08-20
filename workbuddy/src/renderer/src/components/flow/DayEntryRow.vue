@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import { sourceBadge, DEFER_WARN_DAYS } from '@/composables/useFlowDay'
 import type { DayBoardEntry } from '@shared/flowTypes'
+
+const router = useRouter()
 
 const props = defineProps<{
   entry: DayBoardEntry
@@ -24,6 +27,15 @@ const badge = computed(() => sourceBadge(props.entry.source))
 const isDeferred = computed(() => props.entry.deferredCount > 0)
 const isLocked = computed(() => props.entry.locked)
 const isWarn = computed(() => isDeferred.value && props.entry.deferredCount >= DEFER_WARN_DAYS)
+/** 阶段4：来源投影行（project/reminder）——不可改名/挪动/跳过，仅来源跳转+勾选+备注+移出今日 */
+const isProjection = computed(() => props.entry.source === 'project' || props.entry.source === 'reminder')
+/** 来源缺失（源 todo 已删 / 无项目归属）：只读降级展示 */
+const sourceDead = computed(() => isProjection.value && props.entry.sourceHref === null)
+
+function goSource(): void {
+  if (!props.entry.sourceHref) return
+  router.push(props.entry.sourceHref)
+}
 
 const editing = ref(false)
 const editTitle = ref('')
@@ -100,7 +112,12 @@ function confirmMove(): void {
           @keyup.enter="saveRename"
           @keyup.esc="editing = false"
         />
-        <span v-else class="title" :class="{ done: entry.done }">{{ entry.displayTitle }}</span>
+        <span
+          v-else
+          class="title"
+          :class="{ done: entry.done, 'source-dead': sourceDead }"
+          :title="sourceDead ? '来源任务已删除' : undefined"
+        >{{ entry.displayTitle }}</span>
         <!-- 顺延徽章 -->
         <span v-if="isDeferred" class="defer-badge" :class="{ warn: isWarn }">
           顺延{{ entry.deferredCount }}天
@@ -142,24 +159,36 @@ function confirmMove(): void {
 
     <div class="actions">
       <template v-if="!confirm && !showMove && !showNote">
-        <!-- 改名（仅自由行行内编辑；🔒行引导） -->
-        <button class="icon-btn" title="改名" @click="startRename">
-          <AppIcon name="Pencil" :size="15" />
+        <!-- 阶段4：来源投影行 → 来源跳转（不可改名/挪动/跳过） -->
+        <button
+          v-if="isProjection"
+          class="icon-btn"
+          :class="{ disabled: sourceDead }"
+          :title="sourceDead ? '来源任务已删除' : '查看来源'"
+          @click="goSource"
+        >
+          <AppIcon name="ExternalLink" :size="15" />
         </button>
-        <!-- 私有备注 -->
+        <template v-else>
+          <!-- 改名（仅自由行行内编辑；🔒行引导） -->
+          <button class="icon-btn" title="改名" @click="startRename">
+            <AppIcon name="Pencil" :size="15" />
+          </button>
+          <!-- 挪动 -->
+          <button class="icon-btn" title="挪到其它日" @click="openMove">
+            <AppIcon name="MoveRight" :size="15" />
+          </button>
+          <!-- 跳过 -->
+          <button class="icon-btn" title="跳过本场（不计未完成）" @click="confirm = 'skip'">
+            <AppIcon name="SkipForward" :size="15" />
+          </button>
+        </template>
+        <!-- 私有备注（投影行同样可本地编辑） -->
         <button class="icon-btn" :class="{ active: entry.note }" title="私有备注" @click="openNote">
           <AppIcon name="Info" :size="15" />
         </button>
-        <!-- 挪动 -->
-        <button class="icon-btn" title="挪到其它日" @click="openMove">
-          <AppIcon name="MoveRight" :size="15" />
-        </button>
-        <!-- 跳过 -->
-        <button class="icon-btn" title="跳过本场（不计未完成）" @click="confirm = 'skip'">
-          <AppIcon name="SkipForward" :size="15" />
-        </button>
-        <!-- 移除 -->
-        <button class="icon-btn danger" title="移除" @click="confirm = 'delete'">
+        <!-- 移除（投影行=移出今日，不碰源） -->
+        <button class="icon-btn danger" :title="isProjection ? '移出今日' : '移除'" @click="confirm = 'delete'">
           <AppIcon name="Trash2" :size="15" />
         </button>
       </template>
@@ -167,7 +196,7 @@ function confirmMove(): void {
       <!-- 行内确认 -->
       <span v-else-if="confirm" class="confirm-bar">
         <span class="confirm-text">
-          {{ confirm === 'skip' ? '跳过本场？不计未完成' : '移除？凭据保留' }}
+          {{ confirm === 'skip' ? '跳过本场？不计未完成' : (isProjection ? '移出今日？源任务不受影响' : '移除？凭据保留') }}
         </span>
         <button class="tiny-btn primary" @click="confirm === 'skip' ? emit('skip', entry.id) : emit('remove', entry.id); confirm = null">
           确认
@@ -210,6 +239,7 @@ function confirmMove(): void {
   line-height: var(--lh-tight);
 }
 .title.done { color: var(--text-muted); }
+.title.source-dead { color: var(--text-faint); font-style: italic; }
 .locked .title { font-weight: var(--fw-medium); }
 .input {
   font-family: inherit; font-size: var(--fs-body);
@@ -281,6 +311,8 @@ function confirmMove(): void {
 .icon-btn.danger:hover { color: var(--danger); background: var(--danger-faint); }
 .icon-btn.active { color: var(--accent); }
 .icon-btn:disabled { opacity: .35; cursor: default; }
+.icon-btn.disabled { opacity: .35; cursor: default; }
+.icon-btn.disabled:hover { background: transparent; color: var(--text-muted); }
 .confirm-bar { display: flex; align-items: center; gap: var(--s1); }
 .confirm-text { font-size: var(--fs-caption); color: var(--warn); margin-right: var(--s1); }
 .tiny-btn {

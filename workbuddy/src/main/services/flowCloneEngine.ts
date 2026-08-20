@@ -1,4 +1,4 @@
-import { getDb } from '../db/connection'
+import { runInTransaction } from '../db/repositories/unitOfWork'
 import { flowFixedRepo } from '../db/repositories/flowFixedRepo'
 import { flowWeekRepo } from '../db/repositories/flowWeekRepo'
 import { flowDayRepo } from '../db/repositories/flowDayRepo'
@@ -31,7 +31,8 @@ export function materializeWeek(weekStart: string): Result<MaterializeResult> {
     let createdInstances = 0
     let createdEntries = 0
 
-    getDb().transaction(() => {
+    // 阶段6修复批次2 · T1：事务包装下沉 repositories（unitOfWork），service 不再直接触碰 DB API
+    runInTransaction(() => {
       const defs = flowFixedRepo.listActive()
       for (const def of defs) {
         if (flowWeekRepo.existsByDef(start, def.id)) continue
@@ -63,7 +64,7 @@ export function materializeWeek(weekStart: string): Result<MaterializeResult> {
           createdEntries++
         }
       }
-    })()
+    })
 
     return ok({ createdInstances, createdEntries })
   } catch (e: unknown) {

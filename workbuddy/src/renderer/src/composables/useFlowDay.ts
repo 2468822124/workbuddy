@@ -6,7 +6,7 @@
 
 import { ref, shallowRef } from 'vue'
 import { useApi } from './useApi'
-import { addDays, getWeekStart } from '@shared/period'
+import { addDays, getWeekStart, isValidDate } from '@shared/period'
 import type {
   DayBoard,
   DayBoardEntry,
@@ -36,15 +36,13 @@ export function sourceBadge(source: FlowEntrySource): string | null {
   }
 }
 
-/** 解析 ?date= 查询：非法/缺省/数组/月日越界 → 回落今天；合法日期原样返回 */
+/** 解析 ?date= 查询：非法/缺省/数组/真实日历越界（如 2026-02-31）→ 回落今天；合法日期原样返回。
+ * 阶段6修复批次 · F3：复用 @shared/period.isValidDate 真实日历校验（回读年月日逐项一致），
+ * 不再用宽松的 mo/d 范围（2026-02-31 会通过旧检查但 Date 会静默进位）。 */
 export function parseDateQuery(query: unknown, fallbackToday: string): string {
   const raw = Array.isArray(query) ? query[0] : query
   if (typeof raw !== 'string') return fallbackToday
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw)
-  if (!m) return fallbackToday
-  const [, y, mo, d] = m.map(Number)
-  // 拒绝越界月/日（Date.UTC 会静默进位，2026-13-99 → 2027-04-xx）
-  if (mo < 1 || mo > 12 || d < 1 || d > 31) return fallbackToday
+  if (!isValidDate(raw)) return fallbackToday
   return raw
 }
 

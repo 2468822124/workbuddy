@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC, Result } from '@shared/ipc'
-import { Setting, Todo, TodoWithSource, Project, NewsItem, ChatResult, Template, TemplateType, Plan, Review, PlanGuideResult, ReviewDraftResult, PlanTasksByPeriodResult, ReviewSummaryResult, TaskChainItem, PrepareTaskLinkResult } from '@shared/types'
-import { FlowFixedDef, FlowWeekInstance, FlowDayEntry, FlowVoucher, FlowMonthGoal, FlowWeekFocus, FlowPlanTemplate, FlowJournal, WeekBoard, DayBoard } from '@shared/flowTypes'
+import { Setting, Project, NewsItem, ChatResult, ProjectTask, CreateProjectTaskInput, UpdateProjectTaskInput, LegacyArchiveResult } from '@shared/types'
+import { FlowFixedDef, FlowWeekInstance, FlowDayEntry, FlowVoucher, FlowMonthGoal, FlowWeekFocus, FlowPlanTemplate, FlowJournal, WeekBoard, DayBoard, FlowReviewBoard } from '@shared/flowTypes'
 
 const api = {
   settings: {
@@ -38,41 +38,22 @@ const api = {
       return ipcRenderer.invoke(IPC.MORNING_STATUS)
     },
   },
-  todos: {
-    today(date?: string): Promise<Result<Todo[]>> {
-      return ipcRenderer.invoke(IPC.TODOS_TODAY, date)
+  // 阶段6：项目/提醒兼容读写（todos 表唯一项目任务入口；flow 投影只经 service，不经 renderer）
+  projectTasks: {
+    listByProject(projectId: string): Promise<Result<ProjectTask[]>> {
+      return ipcRenderer.invoke(IPC.PROJECT_TASKS_LIST_BY_PROJECT, projectId)
     },
-    // F3.2-2：今日+逾期聚合 + sourceLabel 出处标注
-    withSource(date?: string): Promise<Result<{ today: TodoWithSource[]; overdue: TodoWithSource[] }>> {
-      return ipcRenderer.invoke(IPC.TODOS_WITH_SOURCE, date)
+    create(data: CreateProjectTaskInput): Promise<Result<ProjectTask>> {
+      return ipcRenderer.invoke(IPC.PROJECT_TASKS_CREATE, data)
     },
-    overdue(date?: string): Promise<Result<Todo[]>> {
-      return ipcRenderer.invoke(IPC.TODOS_OVERDUE, date)
+    update(data: UpdateProjectTaskInput & { id: string }): Promise<Result<ProjectTask>> {
+      return ipcRenderer.invoke(IPC.PROJECT_TASKS_UPDATE, data)
     },
-    toggle(id: string): Promise<Result<Todo>> {
-      return ipcRenderer.invoke(IPC.TODOS_TOGGLE, id)
+    delete(id: string): Promise<Result<{ ok: boolean }>> {
+      return ipcRenderer.invoke(IPC.PROJECT_TASKS_DELETE, id)
     },
-    rescheduleToday(id: string): Promise<Result<Todo>> {
-      return ipcRenderer.invoke(IPC.TODOS_RESCHEDULE_TODAY, id)
-    },
-    quickCreate(content: string): Promise<Result<Todo>> {
-      return ipcRenderer.invoke(IPC.TODOS_QUICK_CREATE, content)
-    },
-    byProject(projectId: string): Promise<Result<Todo[]>> {
-      return ipcRenderer.invoke(IPC.TODOS_BY_PROJECT, projectId)
-    },
-    // 子阶段5：planDate 范围查询（月图表确定性数据源）
-    findInRange(data: { from: string; to: string }): Promise<Result<Todo[]>> {
-      return ipcRenderer.invoke(IPC.TODOS_FIND_IN_RANGE, data)
-    },
-    create(data: { content: string; planDate?: string | null; projectId: string }): Promise<Result<Todo>> {
-      return ipcRenderer.invoke(IPC.TODOS_CREATE, data)
-    },
-    update(data: { id: string; content?: string; planDate?: string | null }): Promise<Result<Todo>> {
-      return ipcRenderer.invoke(IPC.TODOS_UPDATE, data)
-    },
-    delete(id: string): Promise<Result<boolean>> {
-      return ipcRenderer.invoke(IPC.TODOS_DELETE, id)
+    toggle(id: string): Promise<Result<ProjectTask>> {
+      return ipcRenderer.invoke(IPC.PROJECT_TASKS_TOGGLE, id)
     },
   },
   projects: {
@@ -94,99 +75,10 @@ const api = {
     export(): Promise<Result<{ path: string }>> { return ipcRenderer.invoke(IPC.DATA_EXPORT) },
     import(): Promise<Result<{ ok: boolean; counts?: Record<string, number>; message?: string }>> { return ipcRenderer.invoke(IPC.DATA_IMPORT) },
   },
-  templates: {
-    list(type?: TemplateType): Promise<Result<Template[]>> {
-      return ipcRenderer.invoke(IPC.TEMPLATES_LIST, { type })
-    },
-    get(id: string): Promise<Result<Template>> {
-      return ipcRenderer.invoke(IPC.TEMPLATES_GET, { id })
-    },
-    upsert(data: {
-      id?: string; name?: string | null; type?: string | null;
-      content?: string | null; isDefault?: boolean
-    }): Promise<Result<Template>> {
-      return ipcRenderer.invoke(IPC.TEMPLATES_UPSERT, data)
-    },
-    delete(id: string): Promise<Result<{ ok: boolean }>> {
-      return ipcRenderer.invoke(IPC.TEMPLATES_DELETE, { id })
-    },
-  },
-  plans: {
-    get(id: string): Promise<Result<Plan | null>> {
-      return ipcRenderer.invoke(IPC.PLAN_GET, { id })
-    },
-    list(opts?: { from?: string; to?: string; type?: string }): Promise<Result<Plan[]>> {
-      return ipcRenderer.invoke(IPC.PLAN_LIST, opts)
-    },
-    byDate(date: string): Promise<Result<Plan | null>> {
-      return ipcRenderer.invoke(IPC.PLAN_BY_DATE, { date })
-    },
-    // v0.2修复计划·§3.6：RunSyncResult 含跨级删除分流计数（cascadeRemovedOpen/cascadeInvalidatedDone）
-    create(data: { date: string; type?: string; content: string; templateId?: string }): Promise<Result<{ plan: Plan; generatedCount: number; removedOpenCount: number; keptDoneCount: number; cascadeRemovedOpenCount: number; cascadeInvalidatedDoneCount: number }>> {
-      return ipcRenderer.invoke(IPC.PLAN_CREATE, data)
-    },
-    update(data: { id: string; content: string; date?: string; type?: string }): Promise<Result<{ plan: Plan; generatedCount: number; removedOpenCount: number; keptDoneCount: number; cascadeRemovedOpenCount: number; cascadeInvalidatedDoneCount: number }>> {
-      return ipcRenderer.invoke(IPC.PLAN_UPDATE, data)
-    },
-    delete(id: string): Promise<Result<{ ok: boolean }>> {
-      return ipcRenderer.invoke(IPC.PLAN_DELETE, { id })
-    },
-    guideQuestion(data: { templateId: string; filled: string }): Promise<Result<PlanGuideResult>> {
-      return ipcRenderer.invoke(IPC.PLAN_GUIDE, data)
-    },
-    // 子阶段5：按 type+期起始查（date=期起始，前端用 periodStartFor 算）
-    getByPeriod(data: { type: string; date: string }): Promise<Result<Plan | null>> {
-      return ipcRenderer.invoke(IPC.PLAN_GET_BY_PERIOD, data)
-    },
-    listTasksByPeriod(data: { type: string; date: string }): Promise<Result<PlanTasksByPeriodResult>> {
-      return ipcRenderer.invoke(IPC.PLAN_LIST_TASKS_BY_PERIOD, data)
-    },
-    // v0.2修复计划·§3.4：匹配键 text→tid（改名后关联存活）
-    markTaskConsumed(data: { planId: string; tid: string }): Promise<Result<Plan>> {
-      return ipcRenderer.invoke(IPC.PLAN_MARK_TASK_CONSUMED, data)
-    },
-    markTaskUnconsumed(data: { planId: string; tid: string }): Promise<Result<Plan>> {
-      return ipcRenderer.invoke(IPC.PLAN_MARK_TASK_UNCONSUMED, data)
-    },
-    // v0.2修复计划·§3.4：pick 预关联（惰性分配 parent tid + 分配 child tid）
-    prepareTaskLink(data: { parentPlanId: string; taskText: string; taskTid?: string }): Promise<Result<PrepareTaskLinkResult>> {
-      return ipcRenderer.invoke(IPC.PLAN_PREPARE_TASK_LINK, data)
-    },
-  },
-  // v0.2修复计划·§3.5：来源链逐级解析（task tid 上溯至源头）
-  tasks: {
-    resolveChain(data: { tid: string }): Promise<Result<TaskChainItem[]>> {
-      return ipcRenderer.invoke(IPC.TASK_RESOLVE_CHAIN, data)
-    },
-  },
-  reviews: {
-    get(id: string): Promise<Result<Review | null>> {
-      return ipcRenderer.invoke(IPC.REVIEW_GET, { id })
-    },
-    list(opts?: { from?: string; to?: string; type?: string }): Promise<Result<Review[]>> {
-      return ipcRenderer.invoke(IPC.REVIEW_LIST, opts)
-    },
-    byDate(date: string, type?: string): Promise<Result<Review | null>> {
-      return ipcRenderer.invoke(IPC.REVIEW_BY_DATE, { date, type })
-    },
-    create(data: { date: string; type?: string; content: string; linkedProjectIds?: string[]; templateId?: string }): Promise<Result<Review>> {
-      return ipcRenderer.invoke(IPC.REVIEW_CREATE, data)
-    },
-    update(data: { id: string; content: string; date?: string; type?: string }): Promise<Result<Review>> {
-      return ipcRenderer.invoke(IPC.REVIEW_UPDATE, data)
-    },
-    delete(id: string): Promise<Result<{ ok: boolean }>> {
-      return ipcRenderer.invoke(IPC.REVIEW_DELETE, { id })
-    },
-    summarizeDraft(data: { date: string }): Promise<Result<ReviewDraftResult>> {
-      return ipcRenderer.invoke(IPC.REVIEW_SUMMARIZE, data)
-    },
-    // 子阶段5：AI 周/月复盘（date=期起始）
-    summarizeWeekly(data: { date: string }): Promise<Result<ReviewSummaryResult>> {
-      return ipcRenderer.invoke(IPC.REVIEW_SUMMARIZE_WEEKLY, data)
-    },
-    summarizeMonthly(data: { date: string }): Promise<Result<ReviewSummaryResult>> {
-      return ipcRenderer.invoke(IPC.REVIEW_SUMMARIZE_MONTHLY, data)
+  // 阶段6：旧表归档（仅设置页用户显式触发）
+  archive: {
+    legacy(): Promise<Result<LegacyArchiveResult>> {
+      return ipcRenderer.invoke(IPC.ARCHIVE_LEGACY)
     },
   },
   // ===== 任务数据流通重构（阶段1：flow_ 新任务域） =====
@@ -196,6 +88,9 @@ const api = {
     },
     dayBoard(date: string): Promise<Result<DayBoard>> {
       return ipcRenderer.invoke(IPC.FLOW_DAY_BOARD, { date })
+    },
+    reviewBoard(weekStart: string): Promise<Result<FlowReviewBoard>> {
+      return ipcRenderer.invoke(IPC.FLOW_REVIEW_BOARD, { weekStart })
     },
     fixedDefs: {
       list(): Promise<Result<FlowFixedDef[]>> {
@@ -240,7 +135,7 @@ const api = {
       },
     },
     entry: {
-      add(data: { date: string; title: string; source: string; locked?: boolean; weekInstanceId?: number | null; projectId?: number | null; reminderKey?: string | null; templateId?: number | null; note?: string | null }): Promise<Result<FlowDayEntry>> {
+      add(data: { date: string; title: string; source: string; locked?: boolean; weekInstanceId?: number | null; projectId?: string | null; reminderKey?: string | null; templateId?: number | null; note?: string | null }): Promise<Result<FlowDayEntry>> {
         return ipcRenderer.invoke(IPC.FLOW_ENTRY_ADD, data)
       },
       toggleCheck(id: number): Promise<Result<{ done: boolean }>> {

@@ -18,7 +18,8 @@ export function registerDataIpc(): void {
   ipcMain.handle(IPC.DATA_IMPORT, async () => {
     try {
       const result = await importAll()
-      if (!result.ok) return err('IMPORT_FAILED', result.message ?? '导入失败')
+      // 阶段6：LEGACY_BACKUP_UNSUPPORTED 等校验码透传（规格 §5.5 旧备份拒绝）
+      if (!result.ok) return err((result as { code?: string }).code ?? 'IMPORT_FAILED', result.message ?? '导入失败')
       return ok(result)
     } catch (e: unknown) {
       logger.error('data:import error', e)

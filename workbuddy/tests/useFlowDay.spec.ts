@@ -39,6 +39,13 @@ describe('parseDateQuery', () => {
     expect(parseDateQuery('2026-00-01', TODAY)).toBe(TODAY)
     expect(parseDateQuery('2026-08-32', TODAY)).toBe(TODAY)
   })
+
+  // 阶段6修复批次 · F3：真实日历校验（复用 @shared/period.isValidDate）
+  it('真实日历不存在的日期（2026-02-31）→ 回落今天', () => {
+    expect(parseDateQuery('2026-02-31', TODAY)).toBe(TODAY)
+    expect(parseDateQuery('2026-04-31', TODAY)).toBe(TODAY)
+    expect(parseDateQuery('2026-11-31', TODAY)).toBe(TODAY)
+  })
 })
 
 describe('shiftDate', () => {

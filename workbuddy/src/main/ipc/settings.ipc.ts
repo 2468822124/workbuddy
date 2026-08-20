@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import { IPC, err, ok } from '@shared/ipc'
 import { settingsRepo } from '../db/repositories/settingsRepo'
-import { getDb, isReadonlyMode } from '../db/connection'
+import { isReadonlyMode } from '../db/connection'
 import { logger } from '../lib/logger'
 
 export function registerSettingsIpc(): void {

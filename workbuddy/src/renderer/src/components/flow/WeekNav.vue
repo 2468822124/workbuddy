@@ -5,6 +5,8 @@ defineProps<{
   label: string
   /** 当前周时隐藏「本周」按钮 */
   isCurrentWeek: boolean
+  /** 阶段5 复盘：本周禁用「下周」 */
+  nextDisabled?: boolean
 }>()
 
 defineEmits<{ prev: []; current: []; next: [] }>()
@@ -19,7 +21,7 @@ defineEmits<{ prev: []; current: []; next: [] }>()
       本周
     </button>
     <div class="label">{{ label }}</div>
-    <button class="nav-btn" title="下周" @click="$emit('next')">
+    <button class="nav-btn" title="下周" :disabled="nextDisabled" @click="$emit('next')">
       <AppIcon name="ChevronRight" />
     </button>
   </div>

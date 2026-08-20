@@ -2,6 +2,7 @@ import { flowWeekRepo } from '../db/repositories/flowWeekRepo'
 import { flowDayRepo } from '../db/repositories/flowDayRepo'
 import { flowVoucherRepo } from '../db/repositories/flowVoucherRepo'
 import { flowGoalRepo } from '../db/repositories/flowGoalRepo'
+import { projectTaskRepo } from '../db/repositories/projectTaskRepo'
 import {
   FlowWeekInstance,
   FlowDayEntry,
@@ -32,7 +33,7 @@ function todayStr(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
-interface InstanceAggregate {
+export interface InstanceAggregate {
   inst: FlowWeekInstance
   entries: FlowDayEntry[]
   manualCount: number
@@ -45,8 +46,9 @@ interface InstanceAggregate {
  * - once：manual 凭据 ≥1 或任一安排行勾选
  * - multi：doneCount = manual + extra + 勾选安排行；doneCount ≥ targetCount
  * arrangedCount = 全周有效安排行数（不含跳过）；rail 活跃度另按"未过期安排"判。
+ * 阶段5 复盘复用本函数（导出），保证与周统筹/日规划同一完成态口径。
  */
-function completionOf(a: InstanceAggregate): InstanceCompletion {
+export function completionOf(a: InstanceAggregate): InstanceCompletion {
   const { inst, entries, manualCount, extraCount, doneEntryIds } = a
   const doneEntries = entries.filter(e => doneEntryIds.has(e.id))
   const arrangedCount = entries.filter(e => e.skippedAt === null).length
@@ -121,7 +123,10 @@ export function getWeekBoard(weekStart: string, today?: string): WeekBoard {
   }
 }
 
-/** 日面板：当日行 + 读时派生顺延（零写入；锁定行不顺延） */
+/**
+ * 日面板：当日行 + 读时派生顺延（零写入；锁定行不顺延——project/reminder 投影
+ * 以 locked=true 创建，天然只留在原日，不随顺延滚入后日，符合「打卡当日有效」语义）。
+ */
 export function getDayBoard(date: string): DayBoard {
   const todayEntries = flowDayRepo.listByDate(date)
   const candidates = flowDayRepo.listDeferredCandidates(date)
@@ -145,14 +150,43 @@ export function getDayBoard(date: string): DayBoard {
     if (inst) instMap.set(id, inst.title)
   }
 
-  const toBoardEntry = (e: FlowDayEntry, isDeferred: boolean): DayBoardEntry => ({
-    ...e,
-    done: doneIds.has(e.id),
-    deferredCount: isDeferred ? diffDays(date, e.date) : 0,
-    displayTitle: e.locked && e.weekInstanceId !== null
+  // 阶段4 项目投影：批量取源 todo（标题/状态实时跟随；源缺失 → 快照降级 + sourceHref=null）
+  const projectIds = [...new Set(
+    all.filter(e => e.source === 'project' && e.projectId !== null).map(e => e.projectId as string)
+  )]
+  const todoMap = new Map(projectTaskRepo.findByIds(projectIds).map(t => [t.id, t]))
+
+  // 阶段4 提醒投影：完成态以提醒源 todo 为准（规格 §5.3：findReminderTask 集中定位，禁止任意正文匹配）
+  const reminderDone = new Map<number, boolean>()
+  for (const e of all.filter(x => x.source === 'reminder')) {
+    const key = e.reminderKey === 'weekly' || e.reminderKey === 'monthly' ? e.reminderKey : null
+    const sourceTodo = key ? projectTaskRepo.findReminderTask(e.date, key) : undefined
+    reminderDone.set(e.id, sourceTodo ? sourceTodo.status === 'done' : false)
+  }
+
+  const toBoardEntry = (e: FlowDayEntry, isDeferred: boolean): DayBoardEntry => {
+    let done = doneIds.has(e.id)
+    let displayTitle = e.locked && e.weekInstanceId !== null
       ? (instMap.get(e.weekInstanceId) ?? e.title)
-      : e.title,
-  })
+      : e.title
+    let sourceHref: string | null = null
+    if (e.source === 'project') {
+      const sourceTodo = e.projectId !== null ? todoMap.get(e.projectId) : undefined
+      done = sourceTodo ? sourceTodo.status === 'done' : false
+      displayTitle = sourceTodo ? sourceTodo.content : e.title
+      sourceHref = sourceTodo?.projectId ? `/projects/${sourceTodo.projectId}` : null
+    } else if (e.source === 'reminder') {
+      done = reminderDone.get(e.id) ?? false
+      sourceHref = e.reminderKey === 'weekly' ? '/flow/week' : '/flow/month'
+    }
+    return {
+      ...e,
+      done,
+      deferredCount: isDeferred ? diffDays(date, e.date) : 0,
+      displayTitle,
+      sourceHref,
+    }
+  }
 
   const entries: DayBoardEntry[] = [
     ...todayEntries
@@ -164,10 +198,5 @@ export function getDayBoard(date: string): DayBoard {
   return { date, entries }
 }
 
-/**
- * 预留位（阶段5 实现）：跨周趋势统计（完成率曲线/顺延重灾区）。
- * 阶段1 不实现，保持接口位稳定供上层预留。
- */
-export function getStats(): null {
-  return null
-}
+// 阶段5 复盘/趋势派生（只读聚合）已迁至 flowReviewDerived.ts（getReviewBoard），
+// 本文件不再保留预留空实现；完成态口径经 completionOf 复用。

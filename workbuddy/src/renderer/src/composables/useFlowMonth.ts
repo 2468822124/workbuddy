@@ -9,14 +9,16 @@ import type { FlowMonthGoal } from '@shared/flowTypes'
 
 // ===== 纯函数（导出单测） =====
 
-/** 解析 ?month= 查询：非法/缺省 → 当月 'YYYY-MM' */
+/** 解析 ?month= 查询：非法/缺省 → 当月 'YYYY-MM'。
+ * 阶段6修复批次 · F3：补年份 >= 1 校验（Date.UTC 对 0-99 年份有 1900 偏移特例，0000-01 会错误解析）。 */
 export function parseMonthQuery(query: unknown, fallbackToday: string): string {
   const raw = Array.isArray(query) ? query[0] : query
   if (typeof raw !== 'string') return fallbackToday.slice(0, 7)
   const m = /^(\d{4})-(\d{2})$/.exec(raw)
   if (!m) return fallbackToday.slice(0, 7)
+  const y = Number(m[1])
   const mo = Number(m[2])
-  if (mo < 1 || mo > 12) return fallbackToday.slice(0, 7)
+  if (y < 1 || mo < 1 || mo > 12) return fallbackToday.slice(0, 7)
   return raw
 }
 

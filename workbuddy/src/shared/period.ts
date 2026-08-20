@@ -1,12 +1,13 @@
-import type { PlanningLevel } from './types'
-
 // ========================================
 // 期键计算（子阶段5）：ISO 周一始周日终 + 月 1 号起始
 // 纯函数；全部用 UTC 算术（Date.UTC + getUTC*），
 // 规避本地时区漂移（子阶段3 LOW-1 教训）。
+// 阶段6：去除旧规划链 PlanningLevel 依赖，flow 域用字面量联合。
 // ========================================
 
 const DAY_MS = 24 * 60 * 60 * 1000
+
+type FlowPeriod = 'daily' | 'weekly' | 'monthly'
 
 /** 'YYYY-MM-DD' → UTC 当日 00:00 的 ms（无时区歧义） */
 function toUtcMs(date: string): number {
@@ -24,9 +25,14 @@ function fromUtcMs(ms: number): string {
   return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`
 }
 
-function isValidDate(date: string): boolean {
+/** 真实日历校验（F4）：'2026-02-31' 必须 false —— Date.UTC 会静默进位为 03-02，
+ * 必须回读验证年月日逐项一致。IPC 首行与服务层共用此守卫。 */
+export function isValidDate(date: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false
-  return !Number.isNaN(toUtcMs(date))
+  const [y, m, d] = date.split('-').map(Number)
+  if (m < 1 || m > 12 || d < 1 || d > 31) return false
+  const t = new Date(Date.UTC(y, m - 1, d))
+  return t.getUTCFullYear() === y && t.getUTCMonth() + 1 === m && t.getUTCDate() === d
 }
 
 /** 本地今天 'YYYY-MM-DD'（仅非法 date 兜底用，不参与期键主路径） */
@@ -80,7 +86,7 @@ export function getMonthRange(date: string): [string, string] {
 /** 期起始：daily→date；weekly→周一；monthly→1 号。date 非法兜底回今天并**按 level 归一化**
  * （用户反馈3.1 根因 C：曾直接返回 todayStr() 未归一化——侧栏进 /planning/weekly 无 date query 时
  *  周六打开 curStart=周六 → 保存 nextStart=周六+7 落在非周一起始，rail 按周一查永远取不到）。 */
-export function periodStartFor(level: PlanningLevel, date: string): string {
+export function periodStartFor(level: FlowPeriod, date: string): string {
   if (!isValidDate(date)) return periodStartFor(level, todayStr())
   if (level === 'daily') return date
   if (level === 'weekly') return getWeekStart(date)
@@ -88,7 +94,7 @@ export function periodStartFor(level: PlanningLevel, date: string): string {
 }
 
 /** 下一期起始：daily +1 天；weekly +7 天；monthly 进次月 1 号 */
-export function nextPeriodStart(level: PlanningLevel, start: string): string {
+export function nextPeriodStart(level: FlowPeriod, start: string): string {
   if (level === 'daily') return fromUtcMs(toUtcMs(start) + DAY_MS)
   if (level === 'weekly') return fromUtcMs(toUtcMs(start) + 7 * DAY_MS)
   const [y, m] = start.split('-').map(Number)
@@ -102,7 +108,7 @@ export function addDays(date: string, n: number): string {
 }
 
 /** 期标签：weekly→`第 N 周 · MM/DD–MM/DD`；monthly→`YYYY 年 M 月`；daily→`YYYY-MM-DD` */
-export function periodLabel(level: PlanningLevel, start: string): string {
+export function periodLabel(level: FlowPeriod, start: string): string {
   if (level === 'daily') return start
   if (level === 'weekly') {
     const [s, e] = getWeekRange(start)

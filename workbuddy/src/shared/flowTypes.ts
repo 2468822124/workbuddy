@@ -60,7 +60,9 @@ export interface FlowDayEntry {
   source: FlowEntrySource
   locked: boolean
   weekInstanceId: number | null
-  projectId: number | null
+  /** 阶段4 口径=源 todo id（旧 todos 表字符串 UUID，非旧 project 表 id）。
+   *  DDL 列仍为 INTEGER 亲和；SQLite 动态类型按 TEXT 原样存取（UUID 非纯数字，不会发生数值强转）。 */
+  projectId: string | null
   reminderKey: string | null
   templateId: number | null
   /** 私有备注（不传播） */
@@ -170,11 +172,81 @@ export interface WeekBoard {
 export interface DayBoardEntry extends FlowDayEntry {
   done: boolean
   deferredCount: number
-  /** 锁定行=实例实时标题 */
+  /** 锁定行=实例实时标题；project 行=源 todo 实时标题（源缺失回落行内快照） */
   displayTitle: string
+  /** 阶段4 来源跳转：project=/projects/:id；reminder=/flow/week|/flow/month；其它/源缺失=null */
+  sourceHref: string | null
 }
 
 export interface DayBoard {
   date: string
   entries: DayBoardEntry[]
+}
+
+// ========================================
+// 阶段5 复盘派生 DTO（只读，禁止落库；字段只能来自查询结果或纯计算）
+// ========================================
+
+export type FlowReviewTaskStatus = 'done' | 'unfinished' | 'skipped'
+
+export interface FlowReviewSummary {
+  plannedCount: number
+  completedPlannedCount: number
+  completionRate: number | null
+  deferredCount: number
+  unfinishedCount: number
+  unarrangedCount: number
+  skippedCount: number
+}
+
+export interface FlowReviewDay {
+  date: string
+  plannedCount: number
+  completedPlannedCount: number
+  completionRate: number | null
+}
+
+export interface FlowReviewTask extends FlowWeekInstance {
+  completion: InstanceCompletion
+  status: FlowReviewTaskStatus
+  /** 目标周内是否至少存在一条未跳过 active 日安排行；展示字段，不是数据库状态 */
+  arranged: boolean
+  /** status='unfinished' 且 arranged=false；未安排清单的服务端判定结果 */
+  unarranged: boolean
+  /** 仅历史周未完成项为 true；UI 可据此显示「转下周」 */
+  carryable: boolean
+}
+
+export interface FlowReviewDeferredEntry {
+  entryId: number
+  title: string
+  source: FlowEntrySource
+  originalDate: string
+  deferredDays: number
+  status: 'open' | 'done'
+  resolvedAt: string | null
+  note: string | null
+}
+
+export interface FlowReviewTrendPoint {
+  weekStart: string
+  weekEnd: string
+  asOf: string
+  plannedCount: number
+  completedPlannedCount: number
+  completionRate: number | null
+  deferredCount: number
+  unarrangedCount: number
+}
+
+export interface FlowReviewBoard {
+  weekStart: string
+  weekEnd: string
+  asOf: string
+  isClosed: boolean
+  summary: FlowReviewSummary
+  days: FlowReviewDay[]
+  tasks: FlowReviewTask[]
+  deferred: FlowReviewDeferredEntry[]
+  trend: FlowReviewTrendPoint[]
 }

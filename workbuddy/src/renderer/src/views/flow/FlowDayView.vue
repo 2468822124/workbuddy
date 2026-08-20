@@ -20,11 +20,33 @@ import JournalBlock from '@/components/flow/JournalBlock.vue'
 const route = useRoute()
 const router = useRouter()
 const api = useApi()
-const fd = useFlowDay()
+// 阶段6修复批次 · F2：顶层解构 refs——模板只自动解包 script setup 顶层绑定；
+// 普通对象属性（fd.date）不解包，会把 Ref 传给纯函数导致 date.split 崩溃（白屏根因）
+const {
+  date,
+  dayBoard,
+  weekBoard,
+  loading,
+  error,
+  info,
+  todayStr,
+  load,
+  reload,
+  setInfo,
+  setError,
+  addManual,
+  railPick,
+  toggleEntry,
+  removeEntry,
+  moveEntry,
+  skipEntry,
+  updateEntryTitle,
+  updateEntryNote,
+} = useFlowDay()
 const tpl = useFlowTemplates()
 
-const today = fd.todayStr()
-const history = computed(() => isHistoryDate(fd.date.value, today))
+const today = todayStr()
+const history = computed(() => isHistoryDate(date.value, today))
 
 /** 日导航：router.replace 改 ?date= 查询 → watch 触发 reload（URL 即状态） */
 function navigate(day: string): void {
@@ -35,8 +57,8 @@ watch(
   () => route.query.date,
   q => {
     const target = parseDateQuery(q, today)
-    if (target !== fd.date.value) {
-      fd.load(target)
+    if (target !== date.value) {
+      load(target)
       loadJournal(target)
     }
   },
@@ -44,7 +66,7 @@ watch(
 
 onMounted(() => {
   const initial = parseDateQuery(route.query.date, today)
-  fd.load(initial)
+  load(initial)
   tpl.load()
   loadJournal(initial)
 })
@@ -58,12 +80,12 @@ async function loadJournal(d: string): Promise<void> {
 }
 
 async function saveJournal(content: string): Promise<void> {
-  const res = await api.flow.journal.save('day', fd.date.value, content)
+  const res = await api.flow.journal.save('day', date.value, content)
   if (res.ok) {
-    fd.setInfo('已保存')
+    setInfo('已保存')
     journalContent.value = content
   } else {
-    fd.setError(res.error?.message ?? '保存失败')
+    setError(res.error?.message ?? '保存失败')
   }
 }
 
@@ -73,7 +95,7 @@ async function applyTemplate(templateId: number, items: { text: string }[]): Pro
   let fail = 0
   for (const item of items) {
     const res = await api.flow.entry.add({
-      date: fd.date.value,
+      date: date.value,
       title: item.text,
       source: 'template',
       templateId,
@@ -84,11 +106,11 @@ async function applyTemplate(templateId: number, items: { text: string }[]): Pro
       fail++
     }
   }
-  await fd.reload()
+  await reload()
   if (fail === 0) {
-    fd.setInfo(`已套用 ${ok} 项`)
+    setInfo(`已套用 ${ok} 项`)
   } else {
-    fd.setError(`成功 ${ok} / 失败 ${fail}`)
+    setError(`成功 ${ok} / 失败 ${fail}`)
   }
 }
 </script>
@@ -96,49 +118,49 @@ async function applyTemplate(templateId: number, items: { text: string }[]): Pro
 <template>
   <div class="page">
     <DayNav
-      :label="fd.date ? dateLabel(fd.date) : ''"
-      :is-today="fd.date === today"
-      @prev="navigate(shiftDate(fd.date, -1))"
+      :label="date ? dateLabel(date) : ''"
+      :is-today="date === today"
+      @prev="navigate(shiftDate(date, -1))"
       @current="navigate(today)"
-      @next="navigate(shiftDate(fd.date, 1))"
+      @next="navigate(shiftDate(date, 1))"
       @jump="navigate($event)"
     />
 
     <!-- 反馈条（错误 8s / 信息 4s 自动消隐；IPC err 可见，禁静默） -->
-    <div v-if="fd.error" class="feedback error">{{ fd.error }}</div>
-    <div v-else-if="fd.info" class="feedback info">{{ fd.info }}</div>
+    <div v-if="error" class="feedback error">{{ error }}</div>
+    <div v-else-if="info" class="feedback info">{{ info }}</div>
     <div v-if="tpl.error" class="feedback error">{{ tpl.error }}</div>
     <div v-else-if="tpl.info" class="feedback info">{{ tpl.info }}</div>
 
-    <div v-if="fd.loading && !fd.dayBoard" class="loading">加载中…</div>
-    <div v-else-if="!fd.dayBoard" class="loading error-text">面板加载失败，请重试</div>
+    <div v-if="loading && !dayBoard" class="loading">加载中…</div>
+    <div v-else-if="!dayBoard" class="loading error-text">面板加载失败，请重试</div>
     <template v-else>
       <div class="grid">
         <!-- 左列：当日任务 -->
         <DayEntryList
-          :entries="fd.dayBoard.entries"
+          :entries="dayBoard.entries"
           :min-date="today"
-          @add="fd.addManual($event)"
-          @toggle="fd.toggleEntry($event)"
-          @remove="fd.removeEntry($event)"
-          @move="(id, d) => fd.moveEntry(id, d)"
-          @skip="fd.skipEntry($event)"
-          @rename="(id, t) => fd.updateEntryTitle(id, t)"
-          @rename-guide="fd.setInfo('锁定行不可改字，请在周统筹页改名')"
-          @update-note="(id, n) => fd.updateEntryNote(id, n)"
+          @add="addManual($event)"
+          @toggle="toggleEntry($event)"
+          @remove="removeEntry($event)"
+          @move="(id, d) => moveEntry(id, d)"
+          @skip="skipEntry($event)"
+          @rename="(id, t) => updateEntryTitle(id, t)"
+          @rename-guide="setInfo('锁定行不可改字，请在周统筹页改名')"
+          @update-note="(id, n) => updateEntryNote(id, n)"
         />
 
         <!-- 右列上：rail 选取 -->
         <RailPanel
-          :rail="fd.weekBoard?.rail ?? []"
+          :rail="weekBoard?.rail ?? []"
           :is-history="history"
-          @pick="(inst: FlowWeekInstance) => fd.railPick(inst)"
+          @pick="(inst: FlowWeekInstance) => railPick(inst)"
         />
 
         <!-- 右列下：模板 -->
         <TemplatePanel
           :templates="tpl.templates"
-          :date="fd.date"
+          :date="date"
           @save="tpl.save($event)"
           @delete="tpl.remove($event)"
           @apply="(tid, items) => applyTemplate(tid, items)"
@@ -147,7 +169,7 @@ async function applyTemplate(templateId: number, items: { text: string }[]): Pro
 
       <!-- 全宽：感想区 -->
       <JournalBlock
-        :date="fd.date"
+        :date="date"
         :content="journalContent"
         @save="saveJournal($event)"
       />

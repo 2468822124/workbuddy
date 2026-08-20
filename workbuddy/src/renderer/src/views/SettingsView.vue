@@ -5,7 +5,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import BaseCard from '@/components/BaseCard.vue'
 import HotspotSourcesEditor from '@/components/settings/HotspotSourcesEditor.vue'
 
-const { settings, testResult, testing, save, testLlm, exportData, importData, refreshNews } = useSettings()
+const { settings, testResult, testing, save, testLlm, exportData, importData, refreshNews, archiveLegacy } = useSettings()
 
 const nickname = ref('')
 const morningStart = ref('06:00')
@@ -17,6 +17,25 @@ const newsSources = ref('[]')
 const importConfirm = ref(false)
 const importMsg = ref('')
 const importMsgOk = ref(false)
+const archiveConfirm = ref(false)
+const archiveMsg = ref('')
+const archiveMsgOk = ref(false)
+
+// 阶段6：旧表归档（规格 §5.4：先备份、再事务 DROP；行内确认条，非阻断模态）
+async function doArchive() {
+  archiveConfirm.value = false
+  archiveMsg.value = ''
+  const r = await archiveLegacy()
+  if (r.ok) {
+    const c = r.data.counts ?? {}
+    const total = (c.plans ?? 0) + (c.tasks ?? 0) + (c.templates ?? 0) + (c.reviews ?? 0)
+    archiveMsg.value = `归档完成：${total} 条旧规划数据已备份，旧表已清理`
+    archiveMsgOk.value = true
+  } else {
+    archiveMsg.value = '归档失败：' + ((r as any)?.error?.message ?? '未知错误')
+    archiveMsgOk.value = false
+  }
+}
 
 watch(settings, (s) => {
   nickname.value = s.nickname ?? ''
@@ -100,6 +119,22 @@ async function doImport() {
         </template>
       </div>
       <div v-if="importMsg" class="import-msg" :class="{ ok: importMsgOk }">{{ importMsg }}</div>
+    </BaseCard>
+
+    <!-- 旧数据清理（阶段6） -->
+    <BaseCard>
+      <div class="card-head"><div class="ico"><AppIcon name="Library" :size="18" /></div><h2>旧数据清理</h2></div>
+      <div class="data-actions">
+        <template v-if="!archiveConfirm">
+          <button class="btn-d warn" @click="archiveConfirm = true"><AppIcon name="Library" :size="16" /> 归档并清理旧规划数据</button>
+        </template>
+        <template v-else>
+          <span class="cfm">将备份旧规划数据到本地 JSON 并删除旧表，确认继续？</span>
+          <button class="btn-d yes" @click="doArchive">确认归档</button>
+          <button class="btn-d no" @click="archiveConfirm = false">取消</button>
+        </template>
+      </div>
+      <div v-if="archiveMsg" class="import-msg" :class="{ ok: archiveMsgOk }">{{ archiveMsg }}</div>
     </BaseCard>
   </div>
 </template>

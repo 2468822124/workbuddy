@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  isValidDate,
   getWeekStart,
   getWeekRange,
   isoWeekOf,
@@ -130,6 +131,33 @@ describe('period.periodLabel', () => {
 
   it('daily → 原样 YYYY-MM-DD', () => {
     expect(periodLabel('daily', '2026-08-07')).toBe('2026-08-07')
+  })
+})
+
+describe('period.isValidDate（真实日历校验，F4）', () => {
+  it("'2026-02-31' → false（Date.UTC 静默进位 03-02，必须回读逐项拒绝）", () => {
+    expect(isValidDate('2026-02-31')).toBe(false)
+  })
+
+  it('闰年 2/29 → true；平年 2/29 → false', () => {
+    expect(isValidDate('2024-02-29')).toBe(true)
+    expect(isValidDate('2026-02-29')).toBe(false)
+  })
+
+  it('格式错误 / 月日越界 → false', () => {
+    expect(isValidDate('2026-8-8')).toBe(false)
+    expect(isValidDate('20260810')).toBe(false)
+    expect(isValidDate('2026-13-01')).toBe(false)
+    expect(isValidDate('2026-00-10')).toBe(false)
+    expect(isValidDate('2026-01-00')).toBe(false)
+    expect(isValidDate('2026-04-31')).toBe(false)
+    expect(isValidDate('abc')).toBe(false)
+  })
+
+  it('真实日期 → true', () => {
+    expect(isValidDate('2026-08-10')).toBe(true)
+    expect(isValidDate('2026-12-31')).toBe(true)
+    expect(isValidDate('2000-02-29')).toBe(true)
   })
 })
 

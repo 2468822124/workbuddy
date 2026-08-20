@@ -2,6 +2,13 @@ import { vi } from 'vitest'
 import { runMigrations } from '../src/main/db/migrate'
 import { getDb } from '../src/main/db/connection'
 
+/** 只读模式开关（阶段6：projectTasks IPC 的 READ_ONLY 分支测试需要） */
+const { readonlyState } = vi.hoisted(() => ({ readonlyState: { on: false } }))
+
+export function setReadonlyMode(on: boolean): void {
+  readonlyState.on = on
+}
+
 /**
  * 阶段1 测试公共基座（非 spec 文件，vitest 不执行）：
  * - vi.mock connection → node:sqlite :memory:（better-sqlite3 ABI 为 Electron 130，
@@ -50,11 +57,11 @@ export function mockConnectionDb(): void {
       stmt.run = (...args: unknown[]) => origRun(...bindArgs(...args))
       return stmt
     }
-    return { getDb: () => db }
+    return { getDb: () => db, isReadonlyMode: () => readonlyState.on }
   })
 }
 
-/** 全量清库 + 重建 schema（0001-0008）；索引随表 drop 自动清理。
+/** 全量清库 + 重建 schema（0001-0009）；索引随表 drop 自动清理。
  * 注意：node:sqlite 默认 foreign_keys=ON（与 better-sqlite3 默认 OFF 相反），
  * DROP 父表撞子表 FK → 必须先关 FK 再清库（清库非业务路径，无安全隐患）。 */
 export function resetDb(): void {

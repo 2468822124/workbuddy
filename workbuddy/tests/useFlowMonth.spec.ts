@@ -18,6 +18,11 @@ describe('parseMonthQuery（?month= 解析）', () => {
     expect(parseMonthQuery('2026-08-14', TODAY)).toBe('2026-08')
   })
 
+  // 阶段6修复批次 · F3：年份 0-99 有 Date.UTC 1900 偏移特例，拒绝（0000-01 不得解析为 1900-01）
+  it('年份 < 1 → 当月（Date.UTC 0-99 年份偏移特例）', () => {
+    expect(parseMonthQuery('0000-01', TODAY)).toBe('2026-08')
+  })
+
   it('数组 query 取首个', () => {
     expect(parseMonthQuery(['2026-09'], TODAY)).toBe('2026-09')
   })

@@ -6,7 +6,7 @@
 
 import { computed, ref, shallowRef } from 'vue'
 import { useApi } from './useApi'
-import { addDays, getWeekStart, getWeekRange, isoWeekOf } from '@shared/period'
+import { addDays, getWeekStart, getWeekRange, isoWeekOf, isValidDate } from '@shared/period'
 import type {
   FlowFixedDef,
   FlowMonthGoal,
@@ -19,15 +19,12 @@ import type {
 
 // ===== 纯函数（导出单测） =====
 
-/** 解析 ?week= 查询：非法/缺省 → 本周周一；一律归一化为周一起始 */
+/** 解析 ?week= 查询：非法/缺省 → 本周周一；一律归一化为周一起始。
+ * 阶段6修复批次 · F3：复用 isValidDate 真实日历校验（拒绝 2026-02-31 等静默进位日期）。 */
 export function parseWeekQuery(query: unknown, fallbackToday: string): string {
   const raw = Array.isArray(query) ? query[0] : query
   if (typeof raw !== 'string') return getWeekStart(fallbackToday)
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw)
-  if (!m) return getWeekStart(fallbackToday)
-  const [, y, mo, d] = m.map(Number)
-  // 拒绝越界月/日（Date.UTC 会静默进位，2026-13-99 → 2027-04-xx）
-  if (mo < 1 || mo > 12 || d < 1 || d > 31) return getWeekStart(fallbackToday)
+  if (!isValidDate(raw)) return getWeekStart(fallbackToday)
   return getWeekStart(raw)
 }
 

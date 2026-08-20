@@ -25,45 +25,6 @@ export interface Todo {
   updatedAt: string
 }
 
-// v0.2修复计划·参照完整性：计划任务（tasks 表；plan.content 为 Markdown 真相源，tasks 为轻量索引）
-export interface Task {
-  tid: string                   // 内联隐形 tid（`<!-- tid:{tid} [parent:{parentTid}] -->`）
-  planId: string
-  content: string
-  parentTaskId: string | null   // 上级任务 tid（同表自引用；任务行可能不存在于 tasks 表）
-  consumed: boolean
-  sortOrder: number
-  isDeleted: boolean
-  deletedAt: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-// v0.2修复计划·参照完整性：todo 的上级任务上下文（todos:withSource 主进程解析注入）
-export interface TodoParentTask {
-  level: PlanningLevel          // 上级计划层级（daily/weekly/monthly；路由跳转用）
-  planId: string
-  planDate: string | null
-  tid: string
-  content: string
-  invalid: boolean              // 上级任务行已被删（来源已删标注）
-}
-
-// F3.2-2 + v0.2修复计划：带出处标注的 todo（todos:withSource 返回；sourceLabel 主进程 labelTodoSource 计算）
-export type TodoWithSource = Todo & {
-  sourceLabel: string
-  parentTask: TodoParentTask | null   // parentTaskRef 解析结果（来源链跳转/失效标注用）
-}
-
-// v0.2修复计划·参照完整性：task:resolveChain 逐级返回（todo → 周任务 → 月任务 → 源头）
-export interface TaskChainItem {
-  level: PlanningLevel
-  planId: string
-  planDate: string | null
-  tid: string
-  content: string
-}
-
 export interface Project {
   id: string
   name: string
@@ -99,12 +60,6 @@ export interface ProjectWithCounts extends Project {
   openTasks: number           // status='todo' AND isDeleted=0
 }
 
-export interface CreateTodoInput {
-  content: string
-  planDate: string | null
-  projectId: string | null
-}
-
 export interface LlmTestResult {
   ok: boolean
   message?: string
@@ -128,99 +83,46 @@ export interface ChatResult {
   latencyMs: number
 }
 
-// 计划与复盘体系（子阶段5：+monthly_plan/monthly_review）
-export type TemplateType =
-  | 'daily_plan'
-  | 'weekly_plan'
-  | 'monthly_plan'
-  | 'daily_review'
-  | 'weekly_review'
-  | 'monthly_review'
+// ========================================
+// 阶段6：项目/提醒兼容视图 —— todos 物理行的最小兼容视图
+// 读取时忽略 sourcePlanId/parentTaskRef/sourceInvalid/sourceTaskTid 等旧规划字段，
+// 不把旧规划字段传播到 flow 域；完成态只由 flow_vouchers 派生，本项目状态不复写。
+// ========================================
+export type ProjectTaskStatus = 'todo' | 'done'
 
-// 子阶段5：规划三级
-export type PlanningLevel = 'daily' | 'weekly' | 'monthly'
-
-export interface Template {
+export interface ProjectTask {
   id: string
-  name: string | null
-  type: TemplateType | null
-  content: string | null
-  isDefault: boolean
-  isDeleted: boolean
-  deletedAt: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Plan {
-  id: string
-  date: string | null              // 'YYYY-MM-DD'
-  type: string | null              // 'daily_plan' | 'weekly_plan'（与模板 type 对齐；字符串留宽）
-  content: string | null           // Markdown 原文
-  generatedTodoIds: string[]       // 解析生成的 todo id（DB 内存 JSON 字符串，repo 层 ↔ 数组）
-  templateId: string | null
-  isDeleted: boolean
-  deletedAt: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Review {
-  id: string
-  date: string | null              // 'YYYY-MM-DD'
-  type: string | null              // 'daily_review' | 'weekly_review'（与模板 type 对齐；字符串留宽）
-  content: string | null           // Markdown 原文
-  linkedProjectIds: string[]       // 关联项目（DB 内存 JSON 字符串，repo 层 ↔ 数组）；本子阶段 UI 不暴露，默认 []
-  isDeleted: boolean
-  deletedAt: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-// 子阶段4：LLM 增强结果类型
-export interface PlanGuideItem {
-  placeholder: string
-  question: string
-  suggestion: string
-}
-export interface PlanGuideResult {
-  items: PlanGuideItem[]
-  latencyMs: number
-}
-export interface ReviewDraftResult {
-  draft: string
-  latencyMs: number
-}
-
-// 子阶段5：AI 结构化复盘结果（直出 Markdown，非 {draft} 包装）
-export interface ReviewSummaryResult {
   content: string
-  latencyMs: number
+  status: ProjectTaskStatus
+  planDate: string | null       // 'YYYY-MM-DD'
+  projectId: string | null
+  isDeleted: boolean
+  deletedAt: string | null
+  completedAt: string | null
+  createdAt: string
+  updatedAt: string
 }
 
-// 子阶段5 + v0.2修复计划：plan:listTasksByPeriod 返回（任务级联；tid=内联隐形标识，未分配为 null）
-export interface PlanTasksByPeriodResult {
-  planId: string | null
-  tasks: {
-    text: string
-    consumed: boolean
-    tid: string | null
-    // 第二轮实测·问题①：已安排到本期内子级计划（daily 页=本周某天 / weekly 页=本月某周）
-    // —— 有 parent:{tid} 行即 true（全期隐藏，跨天/跨周防重复选取；改名不失效）
-    scheduledInPeriod: boolean
-  }[]
+export interface CreateProjectTaskInput {
+  content: string
+  planDate: string | null
+  projectId: string
 }
 
-// v0.2修复计划·§3.4：plan:prepareTaskLink 返回（pick 下沉预关联；行 `- [ ] {taskText} <!-- tid:{childTid} parent:{parentTid} -->`）
-export interface PrepareTaskLinkResult {
-  parentTid: string
-  childTid: string
-  taskText: string
+export interface UpdateProjectTaskInput {
+  content?: string
+  planDate?: string | null
 }
 
-// 子阶段5：周期提醒任务（周日周统筹 / 月末月指导）
-export interface PeriodicReminder {
-  content: string   // 完整待办文案，如「📌 做周统筹 · 第 32 周」
-  prefix: string    // 匹配前缀，如「📌 做周统筹」
-  route: string     // TodayView「前往」跳转路由，如 /planning/weekly
+export interface ReminderTaskInput {
+  date: string                  // 'YYYY-MM-DD'
+  key: 'weekly' | 'monthly'
+  content: string
+}
+
+export type LegacyTableName = 'plans' | 'tasks' | 'templates' | 'reviews'
+
+export interface LegacyArchiveResult {
+  path: string
+  counts: Record<LegacyTableName, number>
 }

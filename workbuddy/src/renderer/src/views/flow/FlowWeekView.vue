@@ -22,11 +22,40 @@ import RailBlock from '@/components/flow/RailBlock.vue'
 
 const route = useRoute()
 const router = useRouter()
-const fw = useFlowWeek()
+// 阶段6修复批次 · F2：顶层解构 refs（模板自动解包只在 script setup 顶层绑定生效；
+// 普通对象属性 fw.weekStart 不解包 → weekLabel 收到 Ref → date.split 崩溃，白屏根因）
+const {
+  weekStart,
+  board,
+  fixedDefs,
+  monthGoalMap,
+  openGoals,
+  loading,
+  error,
+  info,
+  todayStr,
+  load,
+  setInfo,
+  createTemp,
+  renameInstance,
+  deleteInstance,
+  skipInstance,
+  carryNext,
+  manualComplete,
+  addSession,
+  voucherDelete,
+  voucherUpdate,
+  addFocus,
+  toggleFocusDone,
+  deleteFocus,
+  transferFocus,
+  saveFixedDef,
+  deleteFixedDef,
+} = useFlowWeek()
 
-const today = fw.todayStr()
+const today = todayStr()
 
-const isCurrentWeek = computed(() => fw.weekStart.value === getWeekStart(today))
+const isCurrentWeek = computed(() => weekStart.value === getWeekStart(today))
 
 /** 周导航：router.replace 改 ?week= 查询 → watch 触发 reload（URL 即状态） */
 function navigate(week: string): void {
@@ -37,81 +66,81 @@ watch(
   () => route.query.week,
   q => {
     const target = parseWeekQuery(q, today)
-    if (target !== fw.weekStart.value) fw.load(target)
+    if (target !== weekStart.value) load(target)
   },
 )
 
-onMounted(() => fw.load(parseWeekQuery(route.query.week, today)))
+onMounted(() => load(parseWeekQuery(route.query.week, today)))
 
 /** id → 完成态（board 内联实时派生） */
 const completions = computed<Record<number, InstanceCompletion>>(() => {
   const m: Record<number, InstanceCompletion> = {}
-  for (const i of fw.board.value?.instances ?? []) m[i.id] = i.completion
+  for (const i of board.value?.instances ?? []) m[i.id] = i.completion
   return m
 })
 
-const badgeOf = (inst: FlowWeekInstance): string | null => fixedBadge(inst, fw.fixedDefs.value)
-const vouchersOfInst = (inst: FlowWeekInstance) => vouchersOf(inst.id, fw.board.value?.vouchers ?? [])
-const titleOf = (f: FlowWeekFocus): string => focusDisplayTitle(f, fw.monthGoalMap.value)
-const transferredOf = (f: FlowWeekFocus): boolean => hasTransferred(f, fw.board.value?.instances ?? [])
+const badgeOf = (inst: FlowWeekInstance): string | null => fixedBadge(inst, fixedDefs.value)
+const vouchersOfInst = (inst: FlowWeekInstance) => vouchersOf(inst.id, board.value?.vouchers ?? [])
+const titleOf = (f: FlowWeekFocus): string => focusDisplayTitle(f, monthGoalMap.value)
+const transferredOf = (f: FlowWeekFocus): boolean => hasTransferred(f, board.value?.instances ?? [])
 </script>
 
 <template>
   <div class="page">
     <WeekNav
-      :label="fw.weekStart ? weekLabel(fw.weekStart) : ''"
+      :label="weekStart ? weekLabel(weekStart) : ''"
       :is-current-week="isCurrentWeek"
-      @prev="navigate(shiftWeek(fw.weekStart, -1))"
+      @prev="navigate(shiftWeek(weekStart, -1))"
       @current="navigate(getWeekStart(today))"
-      @next="navigate(shiftWeek(fw.weekStart, 1))"
+      @next="navigate(shiftWeek(weekStart, 1))"
     />
 
     <!-- 反馈条（错误 8s / 信息 4s 自动消隐；IPC err 可见，禁静默） -->
-    <div v-if="fw.error" class="feedback error">{{ fw.error }}</div>
-    <div v-else-if="fw.info" class="feedback info">{{ fw.info }}</div>
+    <div v-if="error" class="feedback error">{{ error }}</div>
+    <div v-else-if="info" class="feedback info">{{ info }}</div>
 
-    <div v-if="fw.loading && !fw.board" class="loading">加载中…</div>
-    <div v-else-if="!fw.board" class="loading error-text">面板加载失败，请重试</div>
+    <div v-if="loading && !board" class="loading">加载中…</div>
+    <div v-else-if="!board" class="loading error-text">面板加载失败，请重试</div>
     <template v-else>
       <div class="grid">
         <!-- 上半：核心目标 + 每周固定（Bento 双列） -->
         <FocusBlock
-          :focus="fw.board.focus"
-          :open-goals="fw.openGoals"
+          :focus="board.focus"
+          :open-goals="openGoals"
           :title-of="titleOf"
           :transferred-of="transferredOf"
-          @add="fw.addFocus($event.title, $event.monthGoalId)"
-          @toggle-done="fw.toggleFocusDone($event)"
-          @transfer="fw.transferFocus($event)"
-          @remove="fw.deleteFocus($event)"
+          @add="addFocus($event.title, $event.monthGoalId)"
+          @toggle-done="toggleFocusDone($event)"
+          @transfer="transferFocus($event)"
+          @remove="deleteFocus($event)"
         />
         <FixedDefsPanel
-          :fixed-defs="fw.fixedDefs"
-          @create="fw.saveFixedDef($event)"
-          @save="fw.saveFixedDef($event)"
-          @delete="fw.deleteFixedDef($event)"
+          :fixed-defs="fixedDefs"
+          @create="saveFixedDef($event)"
+          @save="saveFixedDef($event)"
+          @delete="deleteFixedDef($event)"
         />
 
         <!-- 下半：任务清单 + 固定待安排（全宽） -->
         <InstanceList
           class="span2"
-          :instances="fw.board.instances"
+          :instances="board.instances"
           :completions="completions"
           :badge-of="badgeOf"
           :vouchers-of="vouchersOfInst"
-          :is-history="isHistoryWeek(fw.weekStart, today)"
-          @create="fw.createTemp($event.title, $event.kind, $event.targetCount)"
-          @rename="(id, title) => fw.renameInstance(id, title)"
-          @rename-guide="fw.setInfo('固定任务请在左侧「每周固定」里改名（仅影响未来克隆）')"
-          @delete="fw.deleteInstance($event)"
-          @skip="fw.skipInstance($event)"
-          @carry-next="fw.carryNext($event)"
-          @complete="fw.manualComplete($event)"
-          @add-session="fw.addSession($event)"
-          @voucher-delete="fw.voucherDelete($event)"
-          @voucher-update="(id, data) => fw.voucherUpdate(id, data)"
+          :is-history="isHistoryWeek(weekStart, today)"
+          @create="createTemp($event.title, $event.kind, $event.targetCount)"
+          @rename="(id, title) => renameInstance(id, title)"
+          @rename-guide="setInfo('固定任务请在左侧「每周固定」里改名（仅影响未来克隆）')"
+          @delete="deleteInstance($event)"
+          @skip="skipInstance($event)"
+          @carry-next="carryNext($event)"
+          @complete="manualComplete($event)"
+          @add-session="addSession($event)"
+          @voucher-delete="voucherDelete($event)"
+          @voucher-update="(id, data) => voucherUpdate(id, data)"
         />
-        <RailBlock class="span2" :rail="fw.board.rail" :badge-of="badgeOf" />
+        <RailBlock class="span2" :rail="board.rail" :badge-of="badgeOf" />
       </div>
     </template>
   </div>

@@ -26,6 +26,14 @@ export const flowWeekRepo = {
     ).get(weekStart, fixedDefId)
   },
 
+  /** 阶段5：转下周幂等——同一 carriedFrom 源实例在目标周是否已有 active 承接实例 */
+  findActiveByCarry(sourceId: number, weekStart: string): FlowWeekInstance | undefined {
+    const r = getDb().prepare(
+      'SELECT * FROM flow_week_instances WHERE carriedFrom = ? AND weekStart = ? AND isDeleted = 0 LIMIT 1'
+    ).get(sourceId, weekStart)
+    return r ? rowToInst(r as Record<string, unknown>) : undefined
+  },
+
   create(data: Omit<FlowWeekInstance, 'id' | 'isDeleted' | 'deletedAt' | 'createdAt' | 'updatedAt'>): FlowWeekInstance {
     const now = new Date().toISOString()
     const r = getDb().prepare(`

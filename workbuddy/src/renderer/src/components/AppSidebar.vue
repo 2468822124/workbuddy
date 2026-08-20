@@ -9,15 +9,17 @@ const route = useRoute()
 const navItems = [
   { path: '/today', label: '今日总览', icon: 'LayoutGrid' as const, disabled: false },
   { path: '/projects', label: '项目', icon: 'FolderKanban' as const, disabled: false },
+  // 阶段6：规划组四入口统一切换到 flow 正式路径（规格 §5.1；旧 /planning 不再进入）
   {
     path: '/planning',
     label: '规划',
     icon: 'Calendar' as const,
     disabled: false,
     children: [
-      { path: '/planning/daily', label: '日规划', icon: 'Calendar' as const },
-      { path: '/planning/weekly', label: '周统筹', icon: 'RefreshCw' as const },
-      { path: '/planning/monthly', label: '月指导', icon: 'Calendar' as const },
+      { path: '/flow/day', label: '日规划', icon: 'Calendar' as const },
+      { path: '/flow/week', label: '周统筹', icon: 'RefreshCw' as const },
+      { path: '/flow/month', label: '月指导', icon: 'Calendar' as const },
+      { path: '/flow/review', label: '复盘趋势', icon: 'Calendar' as const },
     ],
   },
   { path: '/knowledge', label: '知识库', icon: 'Library' as const, disabled: true, coming: '敬请期待' },

@@ -7,20 +7,22 @@ import { flowTemplateRepo } from '../db/repositories/flowTemplateRepo'
 import { flowJournalRepo } from '../db/repositories/flowJournalRepo'
 import { materializeWeek } from '../services/flowCloneEngine'
 import { getWeekBoard, getDayBoard } from '../services/flowDerived'
+import { getReviewBoard } from '../services/flowReviewDerived'
 import {
   saveFixedDef, deleteFixedDef, createTempInstance, renameInstance, deleteInstance,
   skipInstance, carryInstance, manualCompleteInstance, addSession,
   addEntry, toggleCheckEntry, removeEntry, moveEntry, skipEntry, updateEntry,
   deleteVoucher, updateVoucher,
 } from '../services/flowActions'
-import { getWeekStart, getMonthStart } from '@shared/period'
+import { getWeekStart, getMonthStart, isValidDate } from '@shared/period'
 
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const SCOPE_RE = /^(day|week|month)$/
 const TYPE_RE = /^(daily|weekly)$/
 
+/** 真实日历校验（F4）：复用 @shared/period.isValidDate，'2026-02-31' 等非法日直接拒绝，
+ * 不再依赖正则+Date.UTC 静默进位。 */
 function validDate(s: unknown): s is string {
-  return typeof s === 'string' && DATE_RE.test(s)
+  return typeof s === 'string' && isValidDate(s)
 }
 
 function run<T>(label: string, fn: () => T): Result<T> {
@@ -45,6 +47,18 @@ export function registerFlowIpc(): void {
   ipcMain.handle(IPC.FLOW_DAY_BOARD, (_e, input: { date?: string }) => {
     if (!input || !validDate(input.date)) return err('INVALID_INPUT', 'date 非法日期')
     return run('flow:dayBoard', () => getDayBoard(input.date as string))
+  })
+
+  // ===== 阶段5：复盘面板（只读派生；未来周拒绝，本周/历史周可查） =====
+  ipcMain.handle(IPC.FLOW_REVIEW_BOARD, (_e, input: { weekStart?: string }) => {
+    if (!input || !validDate(input.weekStart)) return err('INVALID_INPUT', 'weekStart 非法日期')
+    const weekStart = getWeekStart(input.weekStart as string)
+    // 本地今天（toISOString 是 UTC，8 小时窗口会算错周）
+    const now = new Date()
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const localToday = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+    if (weekStart > getWeekStart(localToday)) return err('INVALID_INPUT', '复盘仅支持本周及历史周')
+    return run('flow:reviewBoard', () => getReviewBoard(weekStart))
   })
 
   // ===== 固定任务 =====
@@ -104,6 +118,13 @@ export function registerFlowIpc(): void {
   ipcMain.handle(IPC.FLOW_ENTRY_ADD, (_e, input: Record<string, unknown>) => {
     if (!input || typeof input.date !== 'string' || typeof input.title !== 'string' || typeof input.source !== 'string') {
       return err('INVALID_INPUT', 'date/title/source 必填')
+    }
+    // 阶段4：project 投影须携带源 todo id（字符串 UUID）；reminder 投影须携带稳定键
+    if (input.source === 'project' && typeof input.projectId !== 'string') {
+      return err('INVALID_INPUT', 'project 来源必须携带字符串 projectId（源 todo id）')
+    }
+    if (input.source === 'reminder' && typeof input.reminderKey !== 'string') {
+      return err('INVALID_INPUT', 'reminder 来源必须携带 reminderKey')
     }
     return addEntry(input as Parameters<typeof addEntry>[0])
   })

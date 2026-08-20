@@ -6,39 +6,23 @@ import HotspotChat from '@/components/HotspotChat.vue'
 import AppIcon from '@/components/AppIcon.vue'
 import BaseCard from '@/components/BaseCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
-import { addDays, getWeekStart, getMonthStart } from '@shared/period'
-import type { TodoParentTask } from '@shared/types'
+import DayEntryList from '@/components/flow/DayEntryList.vue'
 
 const router = useRouter()
 const {
-  todayTodos, overdueTodos, newsItems, newsOk,
-  nickname, doneCount, total,
-  toggleTodo, rescheduleTodo, quickCreate, refreshNews,
+  entries, summary, newsItems, newsOk,
+  nickname, error, info, todayStr,
+  addManual, toggleEntry, removeEntry, updateEntryNote,
+  updateEntryTitle, moveEntry, skipEntry,
+  setInfo, refreshNews,
 } = useToday()
 
-/** 周期提醒待办 → 对应规划页（子阶段5：周统筹/月指导直达）。 */
-function reminderPath(content: string): string | null {
-  if (content.startsWith('📌 做周统筹')) return '/planning/weekly'
-  if (content.startsWith('📌 做月指导')) return '/planning/monthly'
-  return null
-}
+const listRef = ref<InstanceType<typeof DayEntryList> | null>(null)
 
-/** v0.2修复计划·§3.5：来源 tag → 上级任务所在计划页。
- *  规划页编辑器展示「下一期」计划（nextStart），故 date 偏移到任务所在期 P 的上一期，
- *  使目标任务落在 planDraft 供 focus 定位；无 planDate（边界）→ 只带 focus。 */
-function goParentTask(pt: TodoParentTask) {
-  let prev = ''
-  if (pt.planDate) {
-    prev =
-      pt.level === 'daily' ? addDays(pt.planDate, -1)
-      : pt.level === 'weekly' ? getWeekStart(addDays(pt.planDate, -1))
-      : getMonthStart(addDays(pt.planDate, -1))
-  }
-  const q = prev ? `?date=${prev}&focus=${pt.tid}` : `?focus=${pt.tid}`
-  router.push(`/planning/${pt.level}${q}`)
+/** 阶段4：今日页 → 日规划页（同一批 flow_day_entries 的深度排程视图） */
+function goDayPlanning() {
+  router.push('/flow/day?date=today')
 }
-
-const quickText = ref('')
 
 const greeting = computed(() => {
   const h = new Date().getHours()
@@ -48,18 +32,20 @@ const greeting = computed(() => {
   return '晚安'
 })
 
+/** F3：英文副标按时段动态（与中文问候一致，不再固定 GOOD MORNING） */
+const greetingEn = computed(() => {
+  const h = new Date().getHours()
+  if (h < 6) return 'STILL AWAKE'
+  if (h < 12) return 'GOOD MORNING'
+  if (h < 18) return 'GOOD AFTERNOON'
+  return 'GOOD EVENING'
+})
+
 const dateLabel = computed(() => {
   const d = new Date()
   const days = ['日', '一', '二', '三', '四', '五', '六']
   return `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 · 周${days[d.getDay()]}`
 })
-
-function onAddTodo(e: KeyboardEvent) {
-  if (e.key === 'Enter' && quickText.value.trim()) {
-    quickCreate(quickText.value)
-    quickText.value = ''
-  }
-}
 
 function openLink(url: string) {
   window.open(url, '_blank')
@@ -67,9 +53,7 @@ function openLink(url: string) {
 
 function greetEmoji() {
   const h = new Date().getHours()
-  if (h < 6 || h >= 21) return '🌙'
-  if (h < 12) return '☀'
-  return '☀'
+  return h < 6 || h >= 21 ? '🌙' : '☀'
 }
 </script>
 
@@ -78,64 +62,50 @@ function greetEmoji() {
     <!-- Hero -->
     <section class="b-hero hero">
       <div>
-        <div class="hero-eyebrow">{{ greeting }} · GOOD MORNING</div>
+        <div class="hero-eyebrow">{{ greeting }} · {{ greetingEn }}</div>
         <h1>{{ greeting }}，<span class="hero-name">{{ nickname }}</span> {{ greetEmoji() }}</h1>
-        <p v-if="overdueTodos.length || todayTodos.length">
-          今天有 <b>{{ overdueTodos.length }} 件交接事项</b>
-          <template v-if="todayTodos.length"> 和 <b>{{ todayTodos.length }} 项待办</b></template> 等你处理，慢慢来。
+        <p v-if="summary.total">
+          今天有 <b>{{ summary.total }} 项任务</b>
+          <template v-if="summary.deferredCount">，另有 <b>{{ summary.deferredCount }} 项顺延</b></template> 等你处理，慢慢来。
         </p>
         <p v-else>今天是新的一天，从一份计划开始吧。</p>
         <div class="date"><AppIcon name="Calendar" :size="15" />{{ dateLabel }}</div>
       </div>
       <div class="hero-cta">
         <button class="btn btn-ghost" @click="refreshNews"><AppIcon name="RefreshCw" :size="17" />刷新热点</button>
-        <button class="btn btn-primary" @click="quickText && quickCreate(quickText) || ($refs.quickInput as HTMLInputElement)?.focus()">
+        <button class="btn btn-primary" @click="listRef?.openAdd()">
           <AppIcon name="Plus" :size="17" />新待办
         </button>
       </div>
     </section>
 
-    <!-- 今日待办 -->
+    <!-- 今日总览（flow 任务区：manual / rail / habit / template / project / reminder 四渠道同实体） -->
     <section class="b-todo">
-      <BaseCard>
-        <div class="card-head">
-          <div class="ico"><AppIcon name="CheckSquare" :size="18" /></div>
-          <div><h2>今日待办</h2><div class="sub">已完成 {{ doneCount }} / {{ total }}</div></div>
-          <div class="spacer" />
-          <span class="plan-link" @click="router.push('/planning/daily')">📝 今日计划</span>
-          <span class="chip">{{ doneCount }} / {{ total }}</span>
-        </div>
-        <div class="todo-list">
-          <div v-if="todayTodos.length === 0" class="empty-hint">还没有今日待办 · 在下方快速添加</div>
-          <div
-            v-for="t in todayTodos" :key="t.id"
-            class="todo-row" :class="{ done: t.status === 'done' }"
-            @click="toggleTodo(t.id)"
-          >
-            <div class="check"><AppIcon name="Check" :size="13" /></div>
-            <div class="todo-text">{{ t.content }}</div>
-            <!-- F3.2-2 + v0.2修复计划·§3.5：出处标注 tag；parentTask 可点击跳转（上级已删 → 置灰不可点） -->
-            <span
-              v-if="t.sourceLabel"
-              class="tag tag-work"
-              :class="{ 'tag-src-link': t.parentTask && !t.parentTask.invalid, 'tag-src-dead': t.parentTask?.invalid || t.sourceLabel === '来源已删' }"
-              :title="t.parentTask ? (t.parentTask.invalid ? '上级任务已删除' : '查看来源任务') : (t.sourceLabel === '来源已删' ? '来源任务已删除' : undefined)"
-              @click.stop="t.parentTask && !t.parentTask.invalid && goParentTask(t.parentTask)"
-            >{{ t.sourceLabel }}</span>
-            <span v-if="reminderPath(t.content)" class="rem-go" @click.stop="router.push(reminderPath(t.content)!)">前往</span>
-          </div>
-        </div>
-        <div class="add-row">
-          <AppIcon name="Plus" :size="16" />
-          <input
-            ref="quickInput"
-            v-model="quickText"
-            class="add-input"
-            placeholder="添加待办…"
-            @keydown.enter="onAddTodo"
-          />
-        </div>
-      </BaseCard>
+      <!-- 反馈条：动作失败/成功一律可见（禁静默） -->
+      <div v-if="error" class="banner err"><AppIcon name="AlertCircle" :size="14" />{{ error }}</div>
+      <div v-else-if="info" class="banner ok"><AppIcon name="Check" :size="14" />{{ info }}</div>
+      <DayEntryList
+        ref="listRef"
+        :entries="entries"
+        :min-date="todayStr()"
+        title="今日总览"
+        empty-title="今天还没有任务"
+        empty-hint="手动添加 / 从项目加入 / 提醒打卡"
+        @add="addManual"
+        @toggle="toggleEntry"
+        @remove="removeEntry"
+        @move="(id, d) => moveEntry(id, d)"
+        @skip="skipEntry"
+        @rename="(id, t) => updateEntryTitle(id, t)"
+        @rename-guide="() => setInfo('锁定行不可改名，请在源头周任务处修改')"
+        @update-note="(id, n) => updateEntryNote(id, n)"
+      >
+        <template #head-extra>
+          <span class="plan-link" @click="goDayPlanning">
+            <AppIcon name="CalendarDays" :size="14" />去日规划
+          </span>
+        </template>
+      </DayEntryList>
     </section>
 
     <!-- 今日热点 -->
@@ -165,33 +135,6 @@ function greetEmoji() {
       </BaseCard>
     </section>
 
-    <!-- 交接事项 -->
-    <section class="b-hand">
-      <BaseCard>
-        <div class="card-head">
-          <div class="ico"><AppIcon name="Inbox" :size="18" /></div>
-          <div><h2>交接事项</h2><div class="sub">来自之前的 {{ overdueTodos.length }} 件未完成</div></div>
-          <div class="spacer" />
-        </div>
-        <div v-if="overdueTodos.length === 0" class="empty-hint">没有待处理的交接事项 🎉</div>
-        <div class="hand-list">
-          <div v-for="t in overdueTodos" :key="t.id" class="hand-row">
-            <div class="hand-when">{{ t.planDate ?? '更早' }}</div>
-            <div class="hand-text">{{ t.content }}</div>
-            <!-- F3.2-2 + v0.2修复计划·§3.5：出处标注 tag（顺延·{date} / 手动·{date} 等；parentTask 可点击跳转） -->
-            <span
-              v-if="t.sourceLabel"
-              class="tag tag-work"
-              :class="{ 'tag-src-link': t.parentTask && !t.parentTask.invalid, 'tag-src-dead': t.parentTask?.invalid || t.sourceLabel === '来源已删' }"
-              :title="t.parentTask ? (t.parentTask.invalid ? '上级任务已删除' : '查看来源任务') : (t.sourceLabel === '来源已删' ? '来源任务已删除' : undefined)"
-              @click.stop="t.parentTask && !t.parentTask.invalid && goParentTask(t.parentTask)"
-            >{{ t.sourceLabel }}</span>
-            <div class="hand-act" @click="rescheduleTodo(t.id)"><AppIcon name="CornerUpRight" :size="13" />加入今日</div>
-          </div>
-        </div>
-      </BaseCard>
-    </section>
-
     <!-- 今日灵感（空状态） -->
     <section class="b-idea">
       <BaseCard>
@@ -206,7 +149,7 @@ function greetEmoji() {
 </template>
 
 <style scoped>
-/* Bento grid */
+/* Bento grid（阶段4：任务区并入 flow 总览，交接事项卡移除；灵感区横贯） */
 .bento {
   display: grid;
   gap: var(--s5);
@@ -216,12 +159,11 @@ function greetEmoji() {
     "hero hero hero hero"
     "todo todo hot hot"
     "todo todo hot hot"
-    "hand hand idea idea";
+    "idea idea idea idea";
 }
 .b-hero { grid-area: hero }
 .b-todo { grid-area: todo }
 .b-hot { grid-area: hot }
-.b-hand { grid-area: hand }
 .b-idea { grid-area: idea }
 
 /* Hero */
@@ -290,7 +232,20 @@ function greetEmoji() {
 .btn-ghost { background: transparent; color: var(--text-base); border-color: var(--border); }
 .btn-ghost:hover { background: var(--bg-hover); }
 
-/* Card internals */
+/* 动作反馈条（今日页任务区；可见可恢复） */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s4);
+  border-radius: var(--r-md);
+  font-size: var(--fs-small);
+  margin-bottom: var(--s3);
+}
+.banner.err { background: var(--danger-faint); color: var(--danger); }
+.banner.ok { background: var(--ok-soft); color: var(--ok); }
+
+/* Card internals（热点/灵感卡） */
 .card-head {
   display: flex;
   align-items: center;
@@ -310,24 +265,21 @@ function greetEmoji() {
 h2 { font-size: 16px; font-weight: var(--fw-semibold); color: var(--text-strong); letter-spacing: .01em; }
 .sub { font-size: var(--fs-caption); color: var(--text-faint); margin-top: 1px; }
 .spacer { flex: 1 }
-.chip {
-  font-size: 11px;
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--tracking-wide);
-  padding: 3px 10px;
-  border-radius: var(--r-pill);
-  background: var(--accent-soft);
-  color: var(--accent);
-}
 .plan-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
   color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
   cursor: pointer;
   white-space: nowrap;
-  transition: color var(--dur-base);
+  transition: all var(--dur-base);
 }
-.plan-link:hover { color: var(--accent-press); }
+.plan-link:hover { background: var(--accent); color: var(--text-on-primary); }
 .icon-btn {
   width: 30px;
   height: 30px;
@@ -341,61 +293,6 @@ h2 { font-size: 16px; font-weight: var(--fw-semibold); color: var(--text-strong)
   transition: all var(--dur-base);
 }
 .icon-btn:hover { background: var(--bg-hover); color: var(--accent); }
-
-/* Todo rows */
-.todo-list { display: flex; flex-direction: column; gap: var(--s1); flex: 1; }
-.todo-row {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: 9px 10px;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: background var(--dur-base);
-}
-.todo-row:hover { background: var(--bg-hover); }
-.check {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--r-sm);
-  border: 1.8px solid var(--border);
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  transition: all var(--dur-base);
-  background: var(--bg-surface);
-  color: var(--text-on-primary);
-}
-.todo-row.done .check { background: var(--accent); border-color: var(--accent); }
-.todo-row.done .check :deep(svg) { opacity: 1; transform: scale(1); }
-.check :deep(svg) { opacity: 0; transform: scale(.4); transition: all var(--dur-base); width: 13px; height: 13px; }
-.todo-text { font-size: var(--fs-body); color: var(--text-base); transition: all var(--dur-base); flex: 1; min-width: 0; }
-.todo-row.done .todo-text { color: var(--text-faint); text-decoration: line-through; text-decoration-color: var(--text-faint); }
-.tag { font-size: 11px; font-weight: var(--fw-medium); padding: 2px 9px; border-radius: var(--r-pill); letter-spacing: .02em; flex-shrink: 0; }
-.tag-work { background: var(--cat-work-soft); color: var(--cat-work); }
-.tag-src-link { cursor: pointer; border: 1px solid var(--accent-ring); transition: all var(--dur-base); }
-.tag-src-link:hover { background: var(--accent); color: var(--text-on-primary); }
-.tag-src-dead { background: var(--bg-sunken); color: var(--text-faint); text-decoration: line-through; cursor: default; }
-.add-row {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  margin-top: var(--s4);
-  padding: 10px 12px;
-  border-radius: var(--r-md);
-  background: var(--bg-sunken);
-  border: 1px dashed var(--border);
-}
-.add-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: var(--fs-small);
-  color: var(--text-base);
-  outline: none;
-}
-.add-input::placeholder { color: var(--text-faint); }
 
 /* News */
 .news-list { display: flex; flex-direction: column; gap: var(--s2); flex: 1; overflow: hidden; }
@@ -430,69 +327,12 @@ h2 { font-size: 16px; font-weight: var(--fw-semibold); color: var(--text-strong)
 }
 .news-retry:hover { color: var(--accent); }
 
-/* Chat bar (disabled placeholder) */
-.chat-bar {
-  margin-top: var(--s4);
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: 9px 14px;
-  border-radius: var(--r-pill);
-  background: var(--bg-sunken);
-  border: 1px solid var(--border-soft);
-  font-size: var(--fs-small);
-  transition: all var(--dur-base);
-}
-.chat-bar.disabled { color: var(--text-disabled); cursor: not-allowed; }
-.chat-bar.disabled :deep(svg) { color: var(--text-disabled); }
-.kbd { margin-left: auto; font-size: 11px; color: var(--text-faint); }
-
-/* Handover */
-.hand-list { display: flex; flex-direction: column; gap: var(--s2); }
-.hand-row {
-  display: flex;
-  align-items: center;
-  gap: var(--s3);
-  padding: 10px 12px;
-  border-radius: var(--r-md);
-  background: var(--bg-sunken);
-  border: 1px solid var(--border-soft);
-}
-.hand-when { font-size: 11px; color: var(--warn); font-weight: var(--fw-semibold); flex-shrink: 0; width: 48px; }
-.hand-text { font-size: var(--fs-small); color: var(--text-base); flex: 1; min-width: 0; }
-.hand-act {
-  font-size: var(--fs-caption);
-  color: var(--accent);
-  font-weight: var(--fw-semibold);
-  cursor: pointer;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-.hand-act:hover { color: var(--accent-press); }
-.empty-hint { text-align: center; color: var(--text-faint); padding: var(--s8); font-size: var(--fs-small); }
-
-.rem-go {
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-semibold);
-  color: var(--accent);
-  padding: 3px 10px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--accent-ring);
-  background: var(--accent-soft);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all var(--dur-base);
-}
-.rem-go:hover { background: var(--accent); color: var(--text-on-primary); }
-
 /* Responsive */
 @media (max-width: 980px) {
-  .bento { grid-template-columns: repeat(2, 1fr); grid-template-areas: "hero hero" "todo todo" "hot hot" "hand hand" "idea idea"; }
+  .bento { grid-template-columns: repeat(2, 1fr); grid-template-areas: "hero hero" "todo todo" "hot hot" "idea idea"; }
 }
 @media (max-width: 720px) {
-  .bento { grid-template-columns: 1fr; grid-template-areas: "hero" "todo" "hot" "hand" "idea"; }
+  .bento { grid-template-columns: 1fr; grid-template-areas: "hero" "todo" "hot" "idea"; }
   .hero { flex-direction: column; align-items: flex-start; }
 }
 </style>
