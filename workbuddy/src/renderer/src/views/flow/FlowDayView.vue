@@ -43,7 +43,16 @@ const {
   updateEntryTitle,
   updateEntryNote,
 } = useFlowDay()
-const tpl = useFlowTemplates()
+// UF3 修复：useFlowTemplates() 返回普通对象内嵌 ref，视图层不解包 → tpl.error/tpl.templates
+// 恒为 truthy/Ref（空红条 + 列表为空）。顶层解构（模板自动解包），别名防与 useFlowDay 同名冲突。
+const {
+  templates,
+  error: tplError,
+  info: tplInfo,
+  load: loadTemplates,
+  save,
+  remove,
+} = useFlowTemplates()
 
 const today = todayStr()
 const history = computed(() => isHistoryDate(date.value, today))
@@ -67,7 +76,7 @@ watch(
 onMounted(() => {
   const initial = parseDateQuery(route.query.date, today)
   load(initial)
-  tpl.load()
+  loadTemplates()
   loadJournal(initial)
 })
 
@@ -129,8 +138,8 @@ async function applyTemplate(templateId: number, items: { text: string }[]): Pro
     <!-- 反馈条（错误 8s / 信息 4s 自动消隐；IPC err 可见，禁静默） -->
     <div v-if="error" class="feedback error">{{ error }}</div>
     <div v-else-if="info" class="feedback info">{{ info }}</div>
-    <div v-if="tpl.error" class="feedback error">{{ tpl.error }}</div>
-    <div v-else-if="tpl.info" class="feedback info">{{ tpl.info }}</div>
+    <div v-if="tplError" class="feedback error">{{ tplError }}</div>
+    <div v-else-if="tplInfo" class="feedback info">{{ tplInfo }}</div>
 
     <div v-if="loading && !dayBoard" class="loading">加载中…</div>
     <div v-else-if="!dayBoard" class="loading error-text">面板加载失败，请重试</div>
@@ -159,10 +168,10 @@ async function applyTemplate(templateId: number, items: { text: string }[]): Pro
 
         <!-- 右列下：模板 -->
         <TemplatePanel
-          :templates="tpl.templates"
+          :templates="templates"
           :date="date"
-          @save="tpl.save($event)"
-          @delete="tpl.remove($event)"
+          @save="save($event)"
+          @delete="remove($event)"
           @apply="(tid, items) => applyTemplate(tid, items)"
         />
       </div>

@@ -1,6 +1,6 @@
 {
   "name": "workbuddy",
-  "version": "0.2.0",
+  "version": "0.3.0-c0",
   "description": "AI 原生个人工作台 — WorkBuddy",
   "main": "./out/main/index.js",
   "scripts": {

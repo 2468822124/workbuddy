@@ -47,7 +47,9 @@ function submit(): void {
     id: props.template?.id,
     name: name.value.trim(),
     type: type.value,
-    items: items.value.filter(i => i.text.trim()),
+    // 必须 map 成纯对象：items.value 元素是响应式 Proxy，Electron 结构化克隆
+    // 无法序列化 Proxy → "An object could not be cloned"（GUI 实测：模板创建无列表无反馈）
+    items: items.value.filter(i => i.text.trim()).map(i => ({ text: i.text })),
   })
 }
 </script>

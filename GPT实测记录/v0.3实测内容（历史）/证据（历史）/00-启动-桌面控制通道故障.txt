@@ -1,0 +1,19 @@
+v0.3 GPT 实测 2 启动证据（2026-08-21）
+
+启动方式：E:\workbuddy-test\启动实测.bat
+被测程序：E:\workbuddy-test\app-v0.3\WorkBuddy.exe
+测试数据目录：E:\workbuddy-test\userData\
+唯一测试前缀：v0.3-GPT2-20260821-
+
+只读环境核对：
+- WorkBuddy.exe 进程存在，主窗口标题为 WorkBuddy。
+- 测试数据目录存在 workbuddy.db。
+- 测试目录与真实 %APPDATA%\workbuddy\ 路径不同；未读取真实数据库内容。
+- 本轮没有执行重置脚本，也没有修改业务数据或产品代码。
+
+可见窗口工具结果：
+- 第一次初始化：Computer Use native pipe is unavailable: failed to connect native pipe: 系统找不到指定的文件。
+- 等待 2 秒后重试：同一错误。
+- 重置 Node 控制会话后重新初始化：同一错误。
+
+影响：未取得可见 WorkBuddy 窗口截图或可访问性树，未执行任何点击、输入、导航、确认/取消或业务 GUI 测试。该文件不是产品通过证据，仅记录本轮实测阻断。
