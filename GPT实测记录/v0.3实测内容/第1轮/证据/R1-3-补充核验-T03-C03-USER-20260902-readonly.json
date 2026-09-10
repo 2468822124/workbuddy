@@ -1,0 +1,874 @@
+{
+  "testPoint": "R1-3-T03-C03",
+  "supplementalItem": "U-7",
+  "executedBy": "GPT",
+  "executedAt": "2026-09-02T04:24:20.113Z",
+  "qa": "QA1",
+  "snapshotId": "S1",
+  "packageVersion": "0.3.0-qa.1",
+  "readonly": true,
+  "queryOnly": 1,
+  "databaseId": "B1-20260829/R1-3/USER-20260902/workbuddy.db",
+  "databasePath": "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\R1-3\\USER-20260902\\userData\\workbuddy.db",
+  "prefix": "v0.3-R1-3-USER-20260902",
+  "hashBefore": "C2F11B30D70F814904AFA3332AC56B0751C98B7933B522E004060A9A438E6B42",
+  "integrity": "ok",
+  "foreignKeyCheck": [],
+  "matchingWeekInstances": [
+    {
+      "id": 1,
+      "weekStart": "2026-08-24",
+      "origin": "temp",
+      "fixedDefId": null,
+      "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+      "kind": "once",
+      "targetCount": 1,
+      "sortOrder": 0,
+      "skippedAt": null,
+      "carriedFrom": null,
+      "isDeleted": 0,
+      "deletedAt": null,
+      "createdAt": "2026-09-02T03:39:16.344Z",
+      "updatedAt": "2026-09-02T03:39:16.344Z",
+      "active": true
+    },
+    {
+      "id": 2,
+      "weekStart": "2026-08-31",
+      "origin": "temp",
+      "fixedDefId": null,
+      "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+      "kind": "once",
+      "targetCount": 1,
+      "sortOrder": 0,
+      "skippedAt": null,
+      "carriedFrom": 1,
+      "isDeleted": 0,
+      "deletedAt": null,
+      "createdAt": "2026-09-02T03:42:02.412Z",
+      "updatedAt": "2026-09-02T03:42:02.412Z",
+      "active": true
+    }
+  ],
+  "sourceRows": [
+    {
+      "id": 1,
+      "weekStart": "2026-08-24",
+      "origin": "temp",
+      "fixedDefId": null,
+      "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+      "kind": "once",
+      "targetCount": 1,
+      "sortOrder": 0,
+      "skippedAt": null,
+      "carriedFrom": null,
+      "isDeleted": 0,
+      "deletedAt": null,
+      "createdAt": "2026-09-02T03:39:16.344Z",
+      "updatedAt": "2026-09-02T03:39:16.344Z",
+      "active": true
+    }
+  ],
+  "carryRows": [
+    {
+      "id": 2,
+      "weekStart": "2026-08-31",
+      "origin": "temp",
+      "fixedDefId": null,
+      "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+      "kind": "once",
+      "targetCount": 1,
+      "sortOrder": 0,
+      "skippedAt": null,
+      "carriedFrom": 1,
+      "isDeleted": 0,
+      "deletedAt": null,
+      "createdAt": "2026-09-02T03:42:02.412Z",
+      "updatedAt": "2026-09-02T03:42:02.412Z",
+      "active": true
+    }
+  ],
+  "activeCarryRows": [
+    {
+      "id": 2,
+      "weekStart": "2026-08-31",
+      "origin": "temp",
+      "fixedDefId": null,
+      "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+      "kind": "once",
+      "targetCount": 1,
+      "sortOrder": 0,
+      "skippedAt": null,
+      "carriedFrom": 1,
+      "isDeleted": 0,
+      "deletedAt": null,
+      "createdAt": "2026-09-02T03:42:02.412Z",
+      "updatedAt": "2026-09-02T03:42:02.412Z",
+      "active": true
+    }
+  ],
+  "deletedCarryRows": [],
+  "activeCarryCount": 1,
+  "deletedCarryCount": 0,
+  "flowTableRows": {
+    "flow_day_entries": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "date",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "title",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "source",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "locked",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "weekInstanceId",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "projectId",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "reminderKey",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "templateId",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "note",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "skippedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": []
+    },
+    "flow_fixed_defs": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "title",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "'once'",
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "targetCount",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "1",
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "weekdayMask",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "recurrence",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "'WEEKLY'",
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "note",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": []
+    },
+    "flow_journals": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "scope",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "periodKey",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "content",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": []
+    },
+    "flow_month_goals": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "month",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "title",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "closedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "month": "2026-09",
+          "title": "[v0.3-R1-3-USER-20260902]补充证据-M1 月目标",
+          "closedAt": null,
+          "isDeleted": 1,
+          "deletedAt": "2026-09-02T03:37:47.326Z",
+          "createdAt": "2026-09-02T03:21:51.267Z",
+          "updatedAt": "2026-09-02T03:37:47.326Z"
+        }
+      ]
+    },
+    "flow_plan_templates": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "name",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "type",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "items",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "'[]'",
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": []
+    },
+    "flow_vouchers": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "targetType",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "targetId",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "occurredAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "note",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": []
+    },
+    "flow_week_focus": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "weekStart",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "title",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "monthGoalId",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "doneAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "sortOrder",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": []
+    },
+    "flow_week_instances": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "weekStart",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "origin",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "fixedDefId",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "title",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "'once'",
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "targetCount",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "1",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "sortOrder",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "skippedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "carriedFrom",
+          "type": "INTEGER",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "isDeleted",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "deletedAt",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "createdAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "updatedAt",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": "''",
+          "pk": 0
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "weekStart": "2026-08-24",
+          "origin": "temp",
+          "fixedDefId": null,
+          "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+          "kind": "once",
+          "targetCount": 1,
+          "sortOrder": 0,
+          "skippedAt": null,
+          "carriedFrom": null,
+          "isDeleted": 0,
+          "deletedAt": null,
+          "createdAt": "2026-09-02T03:39:16.344Z",
+          "updatedAt": "2026-09-02T03:39:16.344Z"
+        },
+        {
+          "id": 2,
+          "weekStart": "2026-08-31",
+          "origin": "temp",
+          "fixedDefId": null,
+          "title": "[v0.3-R1-3-USER-20260902]补充证据-H1 历史遗留任务",
+          "kind": "once",
+          "targetCount": 1,
+          "sortOrder": 0,
+          "skippedAt": null,
+          "carriedFrom": 1,
+          "isDeleted": 0,
+          "deletedAt": null,
+          "createdAt": "2026-09-02T03:42:02.412Z",
+          "updatedAt": "2026-09-02T03:42:02.412Z"
+        }
+      ]
+    }
+  },
+  "hashAfter": "C2F11B30D70F814904AFA3332AC56B0751C98B7933B522E004060A9A438E6B42",
+  "hashUnchanged": true,
+  "dataChangedByReadonlyCheck": false
+}

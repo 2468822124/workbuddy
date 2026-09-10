@@ -1,0 +1,22 @@
+{
+  "reviewId": "Review3",
+  "observedAt": "2026-09-05T07:12:40.930Z",
+  "window": {
+    "app": "process:E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "id": 396442,
+    "title": "WorkBuddy"
+  },
+  "accessibility": {
+    "document_text": "欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼 知道了   WorkBuddy 你的工作伙伴 工作台 今日总览 项目 规划 日规划 周统筹 月指导 复盘趋势 知识库敬请期待 运动敬请期待 系统 设置    Agent 已唤醒 等待首次启动  W36 · 2026-08-31 ~ 09-06   本周核心推进目标 0   从月目标选取或手写添加，本周最重要的 3~5 件事   每周固定 1   一次R3-Review3-F1一 改名/惯常日 停用     本周任务清单 1    R3-Review3-F1固定·周一 1        每周固定待安排 1 固定·周一R3-Review3-F1",
+    "focused_element": "16 文档 WorkBuddy ID: 774784",
+    "tree": "Window: \"WorkBuddy\", App: WorkBuddy.exe.\n\t0 窗格 WorkBuddy Secondary Actions: Raise\n\t\t16 文档 WorkBuddy ID: 774784\n\t\t\t17 状态\n\t\t\t\t18 文本 欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼\n\t\t\t\t19 按钮 知道了\n\t\t\t20 补充\n\t\t\t\t21 图像\n\t\t\t\t22 文本 WorkBuddy\n\t\t\t\t23 文本 你的工作伙伴\n\t\t\t\t24 导航\n\t\t\t\t\t25 文本 工作台\n\t\t\t\t\t26 图像\n\t\t\t\t\t27 文本 今日总览\n\t\t\t\t\t28 图像\n\t\t\t\t\t29 文本 项目\n\t\t\t\t\t30 图像\n\t\t\t\t\t31 文本 规划\n\t\t\t\t\t32 图像\n\t\t\t\t\t78 图像\n\t\t\t\t\t79 文本 日规划\n\t\t\t\t\t80 图像\n\t\t\t\t\t81 文本 周统筹\n\t\t\t\t\t82 图像\n\t\t\t\t\t83 文本 月指导\n\t\t\t\t\t84 图像\n\t\t\t\t\t85 文本 复盘趋势\n\t\t\t\t\t33 图像\n\t\t\t\t\t34 文本 知识库\n\t\t\t\t\t35 文本 敬请期待\n\t\t\t\t\t36 图像\n\t\t\t\t\t37 文本 运动\n\t\t\t\t\t38 文本 敬请期待\n\t\t\t\t\t39 文本 系统\n\t\t\t\t\t40 图像\n\t\t\t\t\t41 文本 设置\n\t\t\t\t42 文本 Agent 已唤醒\n\t\t\t\t43 文本 等待首次启动\n\t\t\t44 主要\n\t\t\t\t86 按钮 上周\n\t\t\t\t\t87 图像\n\t\t\t\t88 文本 W36 · 2026-08-31 ~ 09-06\n\t\t\t\t89 按钮 下周\n\t\t\t\t\t90 图像\n\t\t\t\t91 图像\n\t\t\t\t92 文本 0\n\t\t\t\t93 按钮 添加核心目标\n\t\t\t\t\t94 图像\n\t\t\t\t95 文本 从月目标选取或手写添加，本周最重要的 3~5 件事\n\t\t\t\t96 图像\n\t\t\t\t127 文本 1\n\t\t\t\t98 按钮 新建固定任务\n\t\t\t\t\t128 图像\n\t\t\t\t129 列表\n\t\t\t\t\t130 列表项目 (selectable)\n\t\t\t\t\t\t131 文本 一次\n\t\t\t\t\t\t132 文本 R3-Review3-F1\n\t\t\t\t\t\t133 文本 一\n\t\t\t\t\t\t134 按钮 改名/惯常日\n\t\t\t\t\t\t157 按钮 停用\n\t\t\t\t101 图像\n\t\t\t\t136 文本 1\n\t\t\t\t103 按钮 添加任务\n\t\t\t\t\t104 图像\n\t\t\t\t137 列表\n\t\t\t\t\t138 列表项目 (selectable)\n\t\t\t\t\t\t139 按钮 手动完成\n\t\t\t\t\t\t\t140 图像\n\t\t\t\t\t\t141 文本 R3-Review3-F1\n\t\t\t\t\t\t142 文本 固定·周一\n\t\t\t\t\t\t143 图像\n\t\t\t\t\t\t144 文本 1\n\t\t\t\t\t\t145 按钮 跳过本周（不计未完成）\n\t\t\t\t\t\t\t146 图像\n\t\t\t\t\t\t147 按钮 删除\n\t\t\t\t\t\t\t148 图像\n\t\t\t\t107 图像\n\t\t\t\t149 文本 1\n\t\t\t\t150 列表\n\t\t\t\t\t151 列表项目 (selectable)\n\t\t\t\t\t\t152 文本 固定·周一\n\t\t\t\t\t\t153 文本 R3-Review3-F1\n\t\t2 窗格 (disabled)\n\t\t3 标题栏\n\t\t\t4 菜单栏 系统 ID: MenuBar\n\t\t\t\t5 菜单项目 系统\n\t\t\t6 按钮 最小化\n\t\t\t7 按钮 最大化\n\t\t\t8 按钮 关闭\n\t\t9 窗格\n\t\t\t10 窗格\n\t\t\t\t11 窗格\n\t\t\t\t\t12 窗格\n\t\t\t\t\t\t13 窗格\n\t\t\t\t\t\t\t14 窗格\n\t\t\t\t\t\t\t15 窗格\n\nDocument text: ```\n欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼 知道了   WorkBuddy 你的工作伙伴 工作台 今日总览 项目 规划 日规划 周统筹 月指导 复盘趋势 知识库敬请期待 运动敬请期待 系统 设置    Agent 已唤醒 等待首次启动  W36 · 2026-08-31 ~ 09-06   本周核心推进目标 0   从月目标选取或手写添加，本周最重要的 3~5 件事   每周固定 1   一次R3-Review3-F1一 改名/惯常日 停用     本周任务清单 1    R3-Review3-F1固定·周一 1        每周固定待安排 1 固定·周一R3-Review3-F1\n```"
+  },
+  "screenshots": [
+    {
+      "name": "08-normal-cancelled-0.jpg",
+      "id": "screenshot-0",
+      "width": 1186,
+      "height": 776
+    }
+  ]
+}

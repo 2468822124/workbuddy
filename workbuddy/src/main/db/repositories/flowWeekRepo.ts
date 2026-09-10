@@ -34,6 +34,28 @@ export const flowWeekRepo = {
     return r ? rowToInst(r as Record<string, unknown>) : undefined
   },
 
+  /** R1 Fix1（U-3）：批量查 active 承接实例（只读展示用；空入参不发查询） */
+  listActiveByCarriedFrom(sourceIds: number[]): FlowWeekInstance[] {
+    if (sourceIds.length === 0) return []
+    const placeholders = sourceIds.map(() => '?').join(',')
+    return getDb()
+      .prepare(`SELECT * FROM flow_week_instances WHERE carriedFrom IN (${placeholders}) AND isDeleted = 0`)
+      .all(...sourceIds)
+      .map((r: unknown) => rowToInst(r as Record<string, unknown>))
+  },
+
+  /** R3：停用固定定义时，读取生效周之后仍 active 的固定实例。 */
+  listActiveByFixedDefAfter(fixedDefId: number, effectiveWeekStart: string): FlowWeekInstance[] {
+    return getDb()
+      .prepare(`
+        SELECT * FROM flow_week_instances
+        WHERE fixedDefId = ? AND origin = 'fixed' AND weekStart > ? AND isDeleted = 0
+        ORDER BY weekStart ASC, sortOrder ASC, createdAt ASC, id ASC
+      `)
+      .all(fixedDefId, effectiveWeekStart)
+      .map((r: unknown) => rowToInst(r as Record<string, unknown>))
+  },
+
   create(data: Omit<FlowWeekInstance, 'id' | 'isDeleted' | 'deletedAt' | 'createdAt' | 'updatedAt'>): FlowWeekInstance {
     const now = new Date().toISOString()
     const r = getDb().prepare(`

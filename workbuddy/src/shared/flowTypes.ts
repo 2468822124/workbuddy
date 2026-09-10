@@ -160,9 +160,16 @@ export interface FlowVoucherView extends FlowVoucher {
   instanceId: number | null
 }
 
+/** 周面板实例行（只读派生展示）：完成态 + 转出标记（R1 Fix2 U-7，口径与复盘 carried 一致） */
+export interface FlowWeekBoardInstance extends FlowWeekInstance {
+  completion: InstanceCompletion
+  /** 已存在 active 承接实例（carriedFrom=本实例、目标周=本周+7）；展示字段，源实例本身不改状态 */
+  carried: boolean
+}
+
 export interface WeekBoard {
   weekStart: string
-  instances: (FlowWeekInstance & { completion: InstanceCompletion })[]
+  instances: FlowWeekBoardInstance[]
   rail: FlowWeekInstance[]
   focus: FlowWeekFocus[]
   /** 全周 active 凭据（check/manual/extra 同池）——凭据弹层数据源（阶段2 扩展） */
@@ -213,7 +220,9 @@ export interface FlowReviewTask extends FlowWeekInstance {
   arranged: boolean
   /** status='unfinished' 且 arranged=false；未安排清单的服务端判定结果 */
   unarranged: boolean
-  /** 仅历史周未完成项为 true；UI 可据此显示「转下周」 */
+  /** 已存在 active 承接实例（carriedFrom=本实例、目标周=本周+7）；展示字段，源实例本身不改状态 */
+  carried: boolean
+  /** 仅历史周未完成且尚未转出的项为 true；UI 可据此显示「转下周」 */
   carryable: boolean
 }
 

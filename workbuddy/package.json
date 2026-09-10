@@ -3,10 +3,16 @@
   "version": "0.3.0-c0",
   "description": "AI 原生个人工作台 — WorkBuddy",
   "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=22.16.0 <23.0.0",
+    "npm": ">=10.2.0"
+  },
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "preview": "electron-vite preview",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "pack:win": "electron-vite build && electron-builder --win --x64 --dir",
@@ -24,6 +30,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vitest/coverage-v8": "^4.1.11",
     "electron": "^33.3.1",
     "electron-builder": "^25.1.8",
     "electron-rebuild": "^3.2.9",

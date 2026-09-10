@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "kind": "B2-R1-Fix2-source-reconstruction-audit",
+  "baselineDir": "E:\\workbuddy-snapshots\\B2-R1-Fix2-begin",
+  "baselineManifestPath": "E:\\workbuddy-snapshots\\B2-R1-Fix2-begin\\manifest.json",
+  "baselineManifestSha256": "7707f628c93647756c424457d173c0401cd6f545e6561369f5001da860853c9b",
+  "candidateManifestPath": "E:\\workbuddy 复审\\B2\\R1-Fix2-only\\control\\candidate-source-manifest.json",
+  "candidateManifestSha256": "e9f55313e6bbd01bf8d27e331d25b0adeb42ffc98f12fa9950b03d0dfc080ac6",
+  "transcriptPath": "C:\\Users\\lenovo\\.claude\\projects\\e--workspace\\ec520042-7383-4d82-b4ad-3cde635842c2.jsonl",
+  "transcriptSha256": "03e38935c6ac57c5bbcad4bcd806bb0bf31a896f746fea857135f5bfac37289c",
+  "transcriptLineRange": "1983-2395",
+  "operationCount": 17,
+  "operations": [
+    {
+      "line": 1983,
+      "tool": "Edit",
+      "toolUseId": "call_00_9tbJlJfCNWQn7v4QlTge8885",
+      "path": "src/shared/flowTypes.ts",
+      "replacementCount": 1
+    },
+    {
+      "line": 2021,
+      "tool": "Edit",
+      "toolUseId": "call_00_MXni9TzikVLjxLtL919z1143",
+      "path": "src/main/services/flowDerived.ts",
+      "replacementCount": 1
+    },
+    {
+      "line": 2050,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_VOVRR0HCy70VdwZVXihV8913",
+      "path": "src/main/services/flowDerived.ts",
+      "replacementCount": 1
+    },
+    {
+      "line": 2072,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_Uvno0ucuSzo8hsTXgEau8571",
+      "path": "src/main/services/flowDerived.ts",
+      "replacementCount": 1
+    },
+    {
+      "line": 2093,
+      "tool": "Edit",
+      "toolUseId": "call_00_bUD2rYi3jpSNYeoQ7p3o5438",
+      "path": "src/renderer/src/components/flow/InstanceRow.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2113,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_2pivmAQCleerkd5G7t6W6319",
+      "path": "src/renderer/src/components/flow/InstanceRow.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2133,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_dqNcgOYG4vEmxmcVHVD35518",
+      "path": "src/renderer/src/components/flow/InstanceRow.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2153,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_AF5ytcN3LZq3H9mymKMO7766",
+      "path": "src/renderer/src/components/flow/InstanceRow.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2174,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_aXIBRfjOhBpf3OFjqZIO8863",
+      "path": "src/renderer/src/components/flow/InstanceRow.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2195,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_rUdRI2RbGdcMU5vgqd6B6279",
+      "path": "src/renderer/src/components/flow/InstanceRow.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2216,
+      "tool": "Edit",
+      "toolUseId": "call_00_mNEqnfZfmqPmuR3Rhlhi3768",
+      "path": "src/renderer/src/components/flow/InstanceList.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2236,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_9wwJbaDnrbtQ4CUekMqr8114",
+      "path": "src/renderer/src/components/flow/InstanceList.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2256,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_D3ow0fguyRENIfvu8jqi6953",
+      "path": "src/renderer/src/views/flow/FlowWeekView.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2277,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_OBKXvxNhmgnEw2lQr3782261",
+      "path": "src/renderer/src/views/flow/FlowWeekView.vue",
+      "replacementCount": 1
+    },
+    {
+      "line": 2354,
+      "tool": "Write",
+      "toolUseId": "call_00_xrkbu5jywgDBJvQamkDy3941",
+      "path": "tests/r1Fix2.spec.ts",
+      "replacementCount": 1
+    },
+    {
+      "line": 2375,
+      "tool": "Edit",
+      "toolUseId": "call_00_oU60NvGN37dECtQFJTX80984",
+      "path": "tests/r1Fix2.spec.ts",
+      "replacementCount": 1
+    },
+    {
+      "line": 2395,
+      "tool": "Edit",
+      "toolUseId": "call_00_ET_DcjXTBcnIQQUVEDkLeJi9434",
+      "path": "tests/r1Fix2.spec.ts",
+      "replacementCount": 1
+    }
+  ],
+  "changedFiles": [
+    "src/main/services/flowDerived.ts",
+    "src/renderer/src/components/flow/InstanceList.vue",
+    "src/renderer/src/components/flow/InstanceRow.vue",
+    "src/renderer/src/views/flow/FlowWeekView.vue",
+    "src/shared/flowTypes.ts",
+    "tests/r1Fix2.spec.ts"
+  ],
+  "candidateFileCount": 156,
+  "verification": "all candidate paths, SHA-256 hashes, and sizes matched",
+  "outputDir": "E:\\workspace\\.tmp-B2-R1-Fix2-recovered-source"
+}

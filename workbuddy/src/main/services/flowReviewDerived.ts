@@ -43,10 +43,53 @@ function isClosedWeek(weekStart: string, currentWeekStart: string): boolean {
 }
 
 /**
+ * R1 Fix1（U-2）：单实例「计划场次完成归属」。
+ * 修复前统计分子只认安排行上的 active check 凭据，而任务完成态（completionOf）同时认
+ * 实例级 manual/extra「系统外完成」凭据 —— 场次型仅靠 extra 完成时，任务显示 3/3 已完成
+ * 而计划完成率为 0%（用户 R1-2-T05-C03）。这里让两者回到同一凭据池：
+ * 1) 安排行自身有 active check → 该场次完成；
+ * 2) 其余未勾选场次由该实例的 manual/extra 凭据回填：先按 occurredAt 同日匹配（日明细可解释），
+ *    剩余凭据再按计划日升序回填；
+ * 3) 回填上限=该实例计划场次数，分子恒 ≤ 分母。
+ */
+function completedPlannedEntryIds(
+  plannedOfInst: FlowDayEntry[],
+  checkDates: ReadonlyMap<number, string>,
+  offBookDates: readonly string[],
+): Set<number> {
+  const done = new Set<number>()
+  const pending: FlowDayEntry[] = []
+  for (const e of plannedOfInst) {
+    if (checkDates.has(e.id)) done.add(e.id)
+    else pending.push(e)
+  }
+  if (pending.length === 0 || offBookDates.length === 0) return done
+
+  pending.sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
+  const rest = [...offBookDates]
+  const unmatched: FlowDayEntry[] = []
+  for (const e of pending) {
+    const i = rest.indexOf(e.date)
+    if (i === -1) unmatched.push(e)
+    else {
+      rest.splice(i, 1)
+      done.add(e.id)
+    }
+  }
+  for (const e of unmatched) {
+    if (rest.length === 0) break
+    rest.pop()
+    done.add(e.id)
+  }
+  return done
+}
+
+/**
  * 一周的复盘口径（纯计算，唯一统计真相出口）：
  * - plannedCount：目标周内、date ≤ asOf、active、未跳过实例、未跳过安排行的周实例 occurrence
- * - completedPlannedCount：上述行存在 active check 凭据的数量
- * - tasks：全周实例完成态/状态/已安排/可转下周标注
+ * - completedPlannedCount：上述行按 completedPlannedEntryIds 判定完成的数量（与 completionOf 同一凭据池）
+ * - completedEntryIds：完成场次行 id 集合，供 7 日明细复用，保证摘要/明细/趋势同源
+ * - tasks：全周实例完成态/状态/已安排/已转下周/可转下周标注
  * - deferred：顺延清单（完成以 active check occurredAt 为完成日；未完成以 asOf 为观察日）
  */
 function computeWeekReview(
@@ -58,11 +101,14 @@ function computeWeekReview(
   checkDates: ReadonlyMap<number, string>,
   manualCounts: ReadonlyMap<number, number>,
   extraCounts: ReadonlyMap<number, number>,
+  offBookDates: ReadonlyMap<number, string[]>,
+  carriedSourceIds: ReadonlySet<number>,
   candidates: FlowDayEntry[],
 ): {
   tasks: FlowReviewTask[]
   plannedCount: number
   completedPlannedCount: number
+  completedEntryIds: Set<number>
   skippedCount: number
   unarrangedCount: number
   deferred: FlowReviewDeferredEntry[]
@@ -81,6 +127,7 @@ function computeWeekReview(
   const doneEntryIds = new Set(entries.filter(e => checkDates.has(e.id)).map(e => e.id))
 
   const tasks: FlowReviewTask[] = []
+  const completedEntryIds = new Set<number>()
   let plannedCount = 0
   let completedPlannedCount = 0
   let skippedCount = 0
@@ -98,9 +145,11 @@ function computeWeekReview(
 
     // planned 计数：跳过实例的安排行整体出分母；occurrence 跳过出分母
     if (inst.skippedAt === null) {
-      const planned = plannedEntries.filter(e => e.weekInstanceId === inst.id).length
-      plannedCount += planned
-      completedPlannedCount += plannedEntries.filter(e => e.weekInstanceId === inst.id && checkDates.has(e.id)).length
+      const planned = plannedEntries.filter(e => e.weekInstanceId === inst.id)
+      const instDoneIds = completedPlannedEntryIds(planned, checkDates, offBookDates.get(inst.id) ?? [])
+      plannedCount += planned.length
+      completedPlannedCount += instDoneIds.size
+      for (const id of instDoneIds) completedEntryIds.add(id)
       skippedCount += instEntries.filter(e => e.skippedAt !== null).length
     } else {
       skippedCount += 1
@@ -111,13 +160,17 @@ function computeWeekReview(
     const unarranged = status === 'unfinished' && !arranged
     if (unarranged) unarrangedCount += 1
 
+    // R1 Fix1（U-3）：已存在 active 承接实例 → 历史项收敛为「已转下周」，不再提供转周入口
+    const carried = carriedSourceIds.has(inst.id)
+
     tasks.push({
       ...inst,
       completion,
       status,
       arranged,
       unarranged,
-      carryable: status === 'unfinished' && isClosedWeek(weekStart, currentWeekStart),
+      carried,
+      carryable: status === 'unfinished' && !carried && isClosedWeek(weekStart, currentWeekStart),
     })
   }
 
@@ -125,6 +178,7 @@ function computeWeekReview(
     tasks,
     plannedCount,
     completedPlannedCount,
+    completedEntryIds,
     skippedCount,
     unarrangedCount,
     deferred: computeDeferred(candidates, weekStart, asOf, checkDates),
@@ -187,13 +241,16 @@ function summaryOf(w: Awaited<ReturnType<typeof computeWeekReview>>): FlowReview
   }
 }
 
-/** 7 天明细（纯计算）：只计目标周实例、date ≤ asOf、未跳过的 occurrence */
+/**
+ * 7 天明细（纯计算）：只计目标周实例、date ≤ asOf、未跳过的 occurrence。
+ * R1 Fix1（U-2）：完成判定复用选定周的 completedEntryIds，保证 Σ日明细 = 周摘要。
+ */
 function computeDays(
   weekStart: string,
   todayBase: string,
   instById: ReadonlyMap<number, FlowWeekInstance>,
   entries: FlowDayEntry[],
-  checkDates: ReadonlyMap<number, string>,
+  completedEntryIds: ReadonlySet<number>,
 ): FlowReviewDay[] {
   const [, weekEnd] = getWeekRange(weekStart)
   const currentWeekStart = getWeekStart(todayBase)
@@ -206,7 +263,7 @@ function computeDays(
       e.weekInstanceId !== null && instById.has(e.weekInstanceId) &&
       instById.get(e.weekInstanceId as number)?.skippedAt === null,
     )
-    const completed = planned.filter(e => checkDates.has(e.id)).length
+    const completed = planned.filter(e => completedEntryIds.has(e.id)).length
     days.push({
       date,
       plannedCount: planned.length,
@@ -253,17 +310,30 @@ export function getReviewBoard(weekStart: string, today?: string): FlowReviewBoa
   }
   const manualCounts = new Map<number, number>()
   const extraCounts = new Map<number, number>()
+  // R1 Fix1（U-2）：系统外完成凭据的 occurredAt 清单，供计划场次归属（同日优先）
+  const offBookDates = new Map<number, string[]>()
   for (const v of instVouchers) {
     const target = v.targetId
     if (v.kind === 'manual') manualCounts.set(target, (manualCounts.get(target) ?? 0) + 1)
     else if (v.kind === 'extra') extraCounts.set(target, (extraCounts.get(target) ?? 0) + 1)
+    else continue
+    const dates = offBookDates.get(target)
+    if (dates) dates.push(v.occurredAt)
+    else offBookDates.set(target, [v.occurredAt])
+  }
+
+  // R1 Fix1（U-3）：已有 active 承接实例的源实例 id（承接周落在窗口外，须单独查）
+  const carriedSourceIds = new Set<number>()
+  for (const c of flowWeekRepo.listActiveByCarriedFrom(instances.map(i => i.id))) {
+    const src = c.carriedFrom === null ? undefined : instById.get(c.carriedFrom)
+    if (src && c.weekStart === addDays(src.weekStart, 7)) carriedSourceIds.add(src.id)
   }
 
   const candidates = flowDayRepo.listDeferredCandidatesForReview(selectedAsOf)
 
   // 逐周同一口径计算（趋势顺序从最早到最晚，末点为选定周）
   const weekResults = weekStarts.map(ws =>
-    computeWeekReview(ws, instances.filter(i => i.weekStart === ws), todayBase, instById, entries, checkDates, manualCounts, extraCounts, candidates),
+    computeWeekReview(ws, instances.filter(i => i.weekStart === ws), todayBase, instById, entries, checkDates, manualCounts, extraCounts, offBookDates, carriedSourceIds, candidates),
   )
 
   const selected = weekResults[TREND_WEEKS - 1]
@@ -285,7 +355,7 @@ export function getReviewBoard(weekStart: string, today?: string): FlowReviewBoa
     asOf: selectedAsOf,
     isClosed: isClosedWeek(weekStart, currentWeekStart),
     summary: summaryOf(selected),
-    days: computeDays(weekStart, todayBase, instById, entries, checkDates),
+    days: computeDays(weekStart, todayBase, instById, entries, selected.completedEntryIds),
     tasks: selected.tasks,
     deferred: selected.deferred,
     trend,

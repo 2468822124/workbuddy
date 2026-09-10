@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "reviewId": "Review2",
+  "reviewMode": "用户实测 R",
+  "rId": "R1",
+  "fixId": "Fix2",
+  "candidateDir": "E:\\workbuddy 复审\\B2\\R1-Fix2-only",
+  "appDir": "E:\\workbuddy 复审\\B2\\R1-Fix2-only\\app",
+  "userDataDir": "E:\\workbuddy 复审\\B2\\R1-Fix2-only\\userData",
+  "executedAt": "2026-09-02T23:42:39+08:00",
+  "entry": {
+    "route": "file:///E:/workbuddy%20%E5%A4%8D%E5%AE%A1/B2/R1-Fix2-only/app/resources/app.asar/out/renderer/index.html",
+    "formalRoutes": ["/flow/week", "/flow/review"],
+    "remoteDebugPort": 9335,
+    "startup": "WorkBuddy.exe started with WORKBUDDY_USER_DATA pointing only to candidate userData"
+  },
+  "u7": {
+    "sourceWeek": "2026-08-24",
+    "targetWeek": "2026-08-31",
+    "testTitle": "R1-Fix2-U7-Review-20260902",
+    "beforeCarry": {
+      "operation": "GUI create temp task in /flow/week?week=2026-08-24",
+      "expected": "Historical unfinished task has the 转下周（清债） entry",
+      "actual": {
+        "taskVisible": true,
+        "carryButtonCount": 1,
+        "screenshot": "review2-U7-Wminus1-before-carry.png"
+      }
+    },
+    "afterCarry": {
+      "operation": "GUI click 转下周（清债） once and wait for stable feedback",
+      "expected": "Source remains traceable, shows 已转下周 with subdued/struck styling, and the carry entry disappears",
+      "actual": {
+        "feedback": "已转至下周",
+        "rowText": "R1-Fix2-U7-Review-20260902\\n已转下周",
+        "rowClass": "row open carried",
+        "titleTextDecoration": "line-through solid rgb(139, 127, 115)",
+        "titleColor": "rgb(139, 127, 115)",
+        "rowOpacity": "0.6",
+        "carryButtonCount": 0,
+        "screenshot": "review2-U7-Wminus1-after-carry.png"
+      }
+    },
+    "targetWeek": {
+      "operation": "GUI click 下周 to /flow/week?week=2026-08-31",
+      "expected": "One active carried task is visible; no duplicate carry entry is offered in current week",
+      "actual": {
+        "taskRowCount": 1,
+        "rowText": "R1-Fix2-U7-Review-20260902",
+        "buttonTitles": ["手动完成", "改名", "跳过本周（不计未完成）", "删除"],
+        "screenshot": "review2-U7-W0-after-carry.png"
+      }
+    },
+    "reopen": {
+      "operation": "Reload target week, then revisit /flow/review?week=2026-08-24",
+      "actual": {
+        "targetWeekStillHasTask": true,
+        "sourceReviewText": "R1-Fix2-U7-Review-20260902\\n已转下周",
+        "sourceReviewShowsTransferred": true,
+        "screenshot": "review2-U7-review-page.png"
+      }
+    },
+    "browserHealth": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": []
+    }
+  },
+  "notes": [
+    "All business actions above were performed through the visible candidate renderer UI.",
+    "The database was inspected only after the GUI actions through a separate read-only connection; see review2-U7-readonly.json."
+  ]
+}

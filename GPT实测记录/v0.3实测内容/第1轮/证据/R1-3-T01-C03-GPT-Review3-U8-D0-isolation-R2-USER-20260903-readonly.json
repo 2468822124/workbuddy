@@ -1,0 +1,50 @@
+{
+  "capturedAt": "2026-09-03T02:48:25.692Z",
+  "readOnly": true,
+  "databasePath": "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\R2-1\\USER-20260903\\userData\\workbuddy.db",
+  "queryOnly": 1,
+  "integrity": [
+    {
+      "integrity_check": "ok"
+    }
+  ],
+  "foreignKeyCheck": [],
+  "tableNames": [
+    "__schema_migrations",
+    "books",
+    "flow_day_entries",
+    "flow_fixed_defs",
+    "flow_journals",
+    "flow_month_goals",
+    "flow_plan_templates",
+    "flow_vouchers",
+    "flow_week_focus",
+    "flow_week_instances",
+    "inboxes",
+    "news_items",
+    "notes",
+    "plans",
+    "projects",
+    "reviews",
+    "settings",
+    "sqlite_sequence",
+    "tasks",
+    "templates",
+    "todos",
+    "workout_logs"
+  ],
+  "flow": {
+    "flow_day_entries": [],
+    "flow_fixed_defs": [],
+    "flow_journals": [],
+    "flow_month_goals": [],
+    "flow_plan_templates": [],
+    "flow_vouchers": [],
+    "flow_week_focus": [],
+    "flow_week_instances": []
+  },
+  "hashBefore": "6A0D743560514DE05EAB5A57EF87683C2A2DED60046AE00DE1E673872D8D02AC",
+  "hashAfter": "6A0D743560514DE05EAB5A57EF87683C2A2DED60046AE00DE1E673872D8D02AC",
+  "hashUnchanged": true,
+  "dataChangedByReadonlyCheck": false
+}

@@ -1,0 +1,22 @@
+{
+  "reviewId": "Review3",
+  "observedAt": "2026-09-05T07:07:21.152Z",
+  "window": {
+    "app": "process:E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "id": 396442,
+    "title": "WorkBuddy"
+  },
+  "accessibility": {
+    "document_text": "欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼 知道了   WorkBuddy 你的工作伙伴 工作台 今日总览 项目 规划 知识库敬请期待 运动敬请期待 系统 设置    Agent 已唤醒 等待首次启动 午安 · GOOD AFTERNOON 午安，朋友 ☀ 今天是新的一天，从一份计划开始吧。 2026 年 9 月 5 日 · 周六 刷新热点 新待办    今日总览 0 添加任务 去日规划  ☀️ 今天还没有任务 手动添加 / 从项目加入 / 提醒打卡    今日热点 Agent 已为你抓取 0 条  暂无更新，点击重试 配置 AI 后即可对话搜索 去设置   今日灵感  灵感速记即将上线 碎片想法，一闪而过。全局快捷键随时捕捉。 Ctrl + Shift + N",
+    "focused_element": "16 文档 WorkBuddy ID: 774784",
+    "tree": "Window: \"WorkBuddy\", App: WorkBuddy.exe.\n\t0 窗格 WorkBuddy Secondary Actions: Raise\n\t\t16 文档 WorkBuddy ID: 774784\n\t\t\t17 状态\n\t\t\t\t18 文本 欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼\n\t\t\t\t19 按钮 知道了\n\t\t\t20 补充\n\t\t\t\t21 图像\n\t\t\t\t22 文本 WorkBuddy\n\t\t\t\t23 文本 你的工作伙伴\n\t\t\t\t24 导航\n\t\t\t\t\t25 文本 工作台\n\t\t\t\t\t26 图像\n\t\t\t\t\t27 文本 今日总览\n\t\t\t\t\t28 图像\n\t\t\t\t\t29 文本 项目\n\t\t\t\t\t30 图像\n\t\t\t\t\t31 文本 规划\n\t\t\t\t\t32 图像\n\t\t\t\t\t33 图像\n\t\t\t\t\t34 文本 知识库\n\t\t\t\t\t35 文本 敬请期待\n\t\t\t\t\t36 图像\n\t\t\t\t\t37 文本 运动\n\t\t\t\t\t38 文本 敬请期待\n\t\t\t\t\t39 文本 系统\n\t\t\t\t\t40 图像\n\t\t\t\t\t41 文本 设置\n\t\t\t\t42 文本 Agent 已唤醒\n\t\t\t\t43 文本 等待首次启动\n\t\t\t44 主要\n\t\t\t\t45 文本 午安 · GOOD AFTERNOON\n\t\t\t\t46 文本 午安，\n\t\t\t\t47 文本 朋友\n\t\t\t\t48 文本 ☀\n\t\t\t\t49 文本 今天是新的一天，从一份计划开始吧。\n\t\t\t\t50 图像\n\t\t\t\t51 文本 2026 年 9 月 5 日 · 周六\n\t\t\t\t52 按钮 刷新热点\n\t\t\t\t\t53 图像\n\t\t\t\t54 按钮 新待办\n\t\t\t\t\t55 图像\n\t\t\t\t56 图像\n\t\t\t\t57 文本 0\n\t\t\t\t58 按钮 添加任务\n\t\t\t\t\t59 图像\n\t\t\t\t60 图像\n\t\t\t\t61 文本 去日规划\n\t\t\t\t62 文本 ☀️\n\t\t\t\t63 文本 今天还没有任务\n\t\t\t\t64 文本 手动添加 / 从项目加入 / 提醒打卡\n\t\t\t\t65 图像\n\t\t\t\t66 文本 Agent 已为你抓取 0 条\n\t\t\t\t67 按钮\n\t\t\t\t\t68 图像\n\t\t\t\t69 文本 暂无更新，点击重试\n\t\t\t\t70 图像\n\t\t\t\t71 文本 配置 AI 后即可对话搜索\n\t\t\t\t72 按钮 去设置\n\t\t\t\t73 图像\n\t\t\t\t74 图像\n\t\t\t\t75 文本 灵感速记即将上线\n\t\t\t\t76 文本 碎片想法，一闪而过。全局快捷键随时捕捉。\n\t\t\t\t77 文本 Ctrl + Shift + N\n\t\t2 窗格 (disabled)\n\t\t3 标题栏\n\t\t\t4 菜单栏 系统 ID: MenuBar\n\t\t\t\t5 菜单项目 系统\n\t\t\t6 按钮 最小化\n\t\t\t7 按钮 最大化\n\t\t\t8 按钮 关闭\n\t\t9 窗格\n\t\t\t10 窗格\n\t\t\t\t11 窗格\n\t\t\t\t\t12 窗格\n\t\t\t\t\t\t13 窗格\n\t\t\t\t\t\t\t14 窗格\n\t\t\t\t\t\t\t15 窗格\n\nDocument text: ```\n欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼 知道了   WorkBuddy 你的工作伙伴 工作台 今日总览 项目 规划 知识库敬请期待 运动敬请期待 系统 设置    Agent 已唤醒 等待首次启动 午安 · GOOD AFTERNOON 午安，朋友 ☀ 今天是新的一天，从一份计划开始吧。 2026 年 9 月 5 日 · 周六 刷新热点 新待办    今日总览 0 添加任务 去日规划  ☀️ 今天还没有任务 手动添加 / 从项目加入 / 提醒打卡    今日热点 Agent 已为你抓取 0 条  暂无更新，点击重试 配置 AI 后即可对话搜索 去设置   今日灵感  灵感速记即将上线 碎片想法，一闪而过。全局快捷键随时捕捉。 Ctrl + Shift + N\n```"
+  },
+  "screenshots": [
+    {
+      "name": "01-launch-0.jpg",
+      "id": "screenshot-0",
+      "width": 1186,
+      "height": 776
+    }
+  ]
+}

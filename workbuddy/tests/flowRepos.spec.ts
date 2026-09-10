@@ -158,6 +158,56 @@ describe('flowGoalRepo', () => {
     flowGoalRepo.softDeleteFocus(f.id)
     expect(flowGoalRepo.listFocusByWeek(MONDAY)).toHaveLength(0)
   })
+
+  // R2 Fix1（U-4）：同一月目标在同一周重复选取幂等——只产生一条 active 周核心目标
+  function makeGoal(title: string): number {
+    return flowGoalRepo.createGoal({ month: '2026-08', title, closedAt: null }).id
+  }
+
+  it('U-4 同一周同一月目标重复选取不新增 active 行', () => {
+    const goalId = makeGoal('[R2]-M1 月目标')
+    const first = flowGoalRepo.createFocus({ weekStart: MONDAY, title: '[R2]-M1 月目标', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    const again = flowGoalRepo.createFocus({ weekStart: MONDAY, title: '[R2]-M1 月目标', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    expect(again.id).toBe(first.id) // 幂等：返回既有 active 行
+    expect(flowGoalRepo.listFocusByWeek(MONDAY)).toHaveLength(1)
+  })
+
+  it('U-4 连续重复提交（3 次）后仍只有一条 active', () => {
+    const goalId = makeGoal('M1')
+    const first = flowGoalRepo.createFocus({ weekStart: MONDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    flowGoalRepo.createFocus({ weekStart: MONDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    const third = flowGoalRepo.createFocus({ weekStart: MONDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    expect(third.id).toBe(first.id)
+    const rows = flowGoalRepo.listFocusByWeek(MONDAY)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].monthGoalId).toBe(goalId)
+  })
+
+  it('U-4 不同周同一月目标各允许一条（互不影响）', () => {
+    const goalId = makeGoal('M1')
+    const w1 = flowGoalRepo.createFocus({ weekStart: MONDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    const w2 = flowGoalRepo.createFocus({ weekStart: TUESDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    expect(w1.id).not.toBe(w2.id)
+    expect(flowGoalRepo.listFocusByWeek(MONDAY)).toHaveLength(1)
+    expect(flowGoalRepo.listFocusByWeek(TUESDAY)).toHaveLength(1)
+  })
+
+  it('U-4 软删后重新选取可新建 active 行（删除不被幂等守卫阻塞）', () => {
+    const goalId = makeGoal('M1')
+    const old = flowGoalRepo.createFocus({ weekStart: MONDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    flowGoalRepo.softDeleteFocus(old.id)
+    expect(flowGoalRepo.listFocusByWeek(MONDAY)).toHaveLength(0)
+    const fresh = flowGoalRepo.createFocus({ weekStart: MONDAY, title: 'M1', monthGoalId: goalId, doneAt: null, sortOrder: 0 })
+    expect(fresh.id).not.toBe(old.id)
+    expect(flowGoalRepo.listFocusByWeek(MONDAY)).toHaveLength(1)
+  })
+
+  it('U-4 手写目标（无月目标）同标题仍可多条，不受幂等守卫影响', () => {
+    const a = flowGoalRepo.createFocus({ weekStart: MONDAY, title: '临时事项', monthGoalId: null, doneAt: null, sortOrder: 0 })
+    const b = flowGoalRepo.createFocus({ weekStart: MONDAY, title: '临时事项', monthGoalId: null, doneAt: null, sortOrder: 0 })
+    expect(a.id).not.toBe(b.id)
+    expect(flowGoalRepo.listFocusByWeek(MONDAY)).toHaveLength(2)
+  })
 })
 
 describe('flowTemplateRepo', () => {

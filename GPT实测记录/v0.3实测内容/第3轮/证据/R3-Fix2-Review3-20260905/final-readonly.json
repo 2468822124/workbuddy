@@ -1,0 +1,522 @@
+{
+  "reviewId": "Review3",
+  "reviewMode": "用户实测 R",
+  "rId": "R3",
+  "fixId": "Fix2",
+  "label": "final",
+  "capturedAt": "2026-09-05T09:22:14.442Z",
+  "candidate": "E:/workbuddy 复审/B3/R3-Fix2-only",
+  "dbPath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\userData\\workbuddy.db",
+  "readOnly": true,
+  "queryOnly": {
+    "query_only": 1
+  },
+  "integrity": [
+    {
+      "integrity_check": "ok"
+    }
+  ],
+  "foreignKeys": [],
+  "schemas": {
+    "flow_fixed_defs": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "title",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "kind",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'once'",
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "targetCount",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "1",
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "weekdayMask",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "recurrence",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'WEEKLY'",
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "note",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "isDeleted",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "deletedAt",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "createdAt",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "''",
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "updatedAt",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "''",
+        "pk": 0
+      }
+    ],
+    "flow_week_instances": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "weekStart",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "origin",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "fixedDefId",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "title",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "kind",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'once'",
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "targetCount",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "1",
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "sortOrder",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "skippedAt",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "carriedFrom",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "isDeleted",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "deletedAt",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "createdAt",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "''",
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "updatedAt",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "''",
+        "pk": 0
+      }
+    ],
+    "flow_day_entries": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "date",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "title",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "source",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "locked",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "weekInstanceId",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "projectId",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "reminderKey",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "templateId",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "note",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "skippedAt",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "isDeleted",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "deletedAt",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "createdAt",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "''",
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "updatedAt",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "''",
+        "pk": 0
+      }
+    ]
+  },
+  "rows": {
+    "flow_fixed_defs": [
+      {
+        "id": 1,
+        "title": "R3-Review3-F1",
+        "kind": "once",
+        "targetCount": 1,
+        "weekdayMask": 1,
+        "recurrence": "WEEKLY",
+        "note": null,
+        "isDeleted": 0,
+        "deletedAt": null,
+        "createdAt": "2026-09-05T07:09:47.480Z",
+        "updatedAt": "2026-09-05T07:09:47.480Z"
+      }
+    ],
+    "flow_week_instances": [
+      {
+        "id": 1,
+        "weekStart": "2026-08-31",
+        "origin": "fixed",
+        "fixedDefId": 1,
+        "title": "R3-Review3-F1",
+        "kind": "once",
+        "targetCount": 1,
+        "sortOrder": 0,
+        "skippedAt": null,
+        "carriedFrom": null,
+        "isDeleted": 0,
+        "deletedAt": null,
+        "createdAt": "2026-09-05T07:09:47.482Z",
+        "updatedAt": "2026-09-05T07:09:47.482Z"
+      }
+    ],
+    "flow_day_entries": [
+      {
+        "id": 1,
+        "date": "2026-08-31",
+        "title": "R3-Review3-F1",
+        "source": "habit",
+        "locked": 1,
+        "weekInstanceId": 1,
+        "projectId": null,
+        "reminderKey": null,
+        "templateId": null,
+        "note": null,
+        "skippedAt": null,
+        "isDeleted": 0,
+        "deletedAt": null,
+        "createdAt": "2026-09-05T07:09:47.483Z",
+        "updatedAt": "2026-09-05T07:09:47.483Z"
+      }
+    ]
+  },
+  "before": {
+    "workbuddy.db": "fc04dab93eaa19b4894da8d02809443f34e25131e3d500a92623e005a9c3849b",
+    "workbuddy.db-wal": null,
+    "workbuddy.db-shm": null
+  },
+  "after": {
+    "workbuddy.db": "fc04dab93eaa19b4894da8d02809443f34e25131e3d500a92623e005a9c3849b",
+    "workbuddy.db-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workbuddy.db-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+  },
+  "databaseUnchangedByRead": true,
+  "candidateAudit": {
+    "meta": {
+      "schemaVersion": 1,
+      "kind": "r-fix-review-candidate",
+      "status": "completed",
+      "candidateType": "r-only",
+      "batchId": "B3",
+      "rId": "R3",
+      "fixId": "Fix2",
+      "createdAt": "2026-09-04T10:40:32Z",
+      "codeRoot": "E:\\workspace\\workbuddy",
+      "candidateDir": "E:\\workbuddy 复审\\B3\\R3-Fix2-only",
+      "appDir": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app",
+      "userDataDir": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\userData",
+      "evidenceDir": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\evidence",
+      "reviewLauncher": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\启动复审-R3-Fix2.bat",
+      "launchCommand": "app\\WorkBuddy.exe",
+      "candidateSource": "E:\\workspace\\workbuddy",
+      "candidateBaseCommit": "a6aa7307bb6426486059dfc01b1d17297ff3312e",
+      "baselineHead": "a6aa7307bb6426486059dfc01b1d17297ff3312e",
+      "baselineTreeFingerprint": "ba4e5fba17935348b81760e28711f3fdf31456784a6dca8ad79123607982e44e",
+      "baselineWorkspaceFingerprint": "98d9cbcd029b97eadf14037e19ffbc80dd4bbdb6c702174a5b3cf99e8582287e",
+      "preFixStatus": " M workbuddy/src/main/db/repositories/flowGoalRepo.ts\n M workbuddy/src/main/db/repositories/flowWeekRepo.ts\n M workbuddy/src/main/ipc/flow.ipc.ts\n M workbuddy/src/main/services/flowActions.ts\n M workbuddy/src/main/services/flowReviewDerived.ts\n M workbuddy/src/preload/index.ts\n M workbuddy/src/renderer/src/components/flow/FixedDefsPanel.vue\n M workbuddy/src/renderer/src/components/flow/review/ReviewTaskList.vue\n M workbuddy/src/renderer/src/composables/useFlowWeek.ts\n M workbuddy/src/renderer/src/views/flow/FlowWeekView.vue\n M workbuddy/src/shared/flowTypes.ts\n M workbuddy/tests/flowRepos.spec.ts\n M workbuddy/tests/reviewComponents.spec.ts\n?? workbuddy/tests/fixedDefRetirement.spec.ts\n?? workbuddy/tests/fixedDefsPanel.spec.ts\n?? workbuddy/tests/preloadFlowFixedDefs.spec.ts\n?? workbuddy/tests/r1Fix1.spec.ts",
+      "postFixWorkspaceFingerprint": "9c8d30456b0c3f54c2fb4e670d067f5b70a0a891f6369912f21156ae66043d1a",
+      "postFixTreeFingerprint": "bef000ac1fd13f40890a3e8669019dbd8ed679fd305562a2047beb4e68347d61",
+      "worktreeChangedFiles": [
+        "src/main/db/repositories/flowWeekRepo.ts",
+        "src/main/ipc/flow.ipc.ts",
+        "src/main/services/flowActions.ts",
+        "src/preload/index.ts",
+        "src/renderer/src/components/flow/FixedDefsPanel.vue",
+        "src/renderer/src/composables/useFlowWeek.ts",
+        "src/renderer/src/views/flow/FlowWeekView.vue",
+        "tests/fixedDefRetirement.spec.ts"
+      ],
+      "candidateChangedFiles": [
+        "src/main/db/repositories/flowWeekRepo.ts",
+        "src/main/ipc/flow.ipc.ts",
+        "src/main/services/flowActions.ts",
+        "src/preload/index.ts",
+        "src/renderer/src/components/flow/FixedDefsPanel.vue",
+        "src/renderer/src/composables/useFlowWeek.ts",
+        "src/renderer/src/views/flow/FlowWeekView.vue",
+        "tests/fixedDefRetirement.spec.ts"
+      ],
+      "allowedSourceFiles": [
+        "src/main/db/repositories/flowWeekRepo.ts",
+        "src/main/ipc/flow.ipc.ts",
+        "src/main/services/flowActions.ts",
+        "src/preload/index.ts",
+        "src/renderer/src/components/flow/FixedDefsPanel.vue",
+        "src/renderer/src/composables/useFlowWeek.ts",
+        "src/renderer/src/views/flow/FlowWeekView.vue",
+        "tests/fixedDefRetirement.spec.ts"
+      ],
+      "allowedWorktreeFiles": [
+        "src/main/db/repositories/flowWeekRepo.ts",
+        "src/main/ipc/flow.ipc.ts",
+        "src/main/services/flowActions.ts",
+        "src/preload/index.ts",
+        "src/renderer/src/components/flow/FixedDefsPanel.vue",
+        "src/renderer/src/composables/useFlowWeek.ts",
+        "src/renderer/src/views/flow/FlowWeekView.vue",
+        "tests/fixedDefRetirement.spec.ts"
+      ],
+      "approvedDiffFingerprint": "ac9fb6bc5a2301ce4441b4dc4ab6e81d17c663e8d8966d3c570074d474109ad0",
+      "candidateSourceManifestPath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\control\\candidate-source-manifest.json",
+      "candidateSourceManifestSha256": "e6ec13e3ba52a32971834f6882c3dcd2f56949e2b86bfafb93a38c1a769acc8d",
+      "build": {
+        "appRoot": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app",
+        "manifestPath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\control\\build-manifest.json",
+        "manifestSha256": "fb21d0be4feffbbfb18a037df54cd7fee97cdd7420497af1f26ca75167512cdf",
+        "treeFingerprint": "91e3f1367fc61bf388a3b351365362f5e29f1f0e29ea8720f2057cd7f9a02d3c",
+        "fileCount": 100,
+        "totalBytes": 335402370
+      },
+      "reviewStatus": "not-reviewed",
+      "restoreStatus": "verified",
+      "scope": "only-approved-R-fix",
+      "nextAction": "05-r-only-review",
+      "restoredWorkspaceFingerprint": "98d9cbcd029b97eadf14037e19ffbc80dd4bbdb6c702174a5b3cf99e8582287e",
+      "restoredTreeFingerprint": "ba4e5fba17935348b81760e28711f3fdf31456784a6dca8ad79123607982e44e",
+      "restoredStatus": " M workbuddy/src/main/db/repositories/flowGoalRepo.ts\n M workbuddy/src/main/db/repositories/flowWeekRepo.ts\n M workbuddy/src/main/ipc/flow.ipc.ts\n M workbuddy/src/main/services/flowActions.ts\n M workbuddy/src/main/services/flowReviewDerived.ts\n M workbuddy/src/preload/index.ts\n M workbuddy/src/renderer/src/components/flow/FixedDefsPanel.vue\n M workbuddy/src/renderer/src/components/flow/review/ReviewTaskList.vue\n M workbuddy/src/renderer/src/composables/useFlowWeek.ts\n M workbuddy/src/renderer/src/views/flow/FlowWeekView.vue\n M workbuddy/src/shared/flowTypes.ts\n M workbuddy/tests/flowRepos.spec.ts\n M workbuddy/tests/reviewComponents.spec.ts\n?? workbuddy/tests/fixedDefRetirement.spec.ts\n?? workbuddy/tests/fixedDefsPanel.spec.ts\n?? workbuddy/tests/preloadFlowFixedDefs.spec.ts\n?? workbuddy/tests/r1Fix1.spec.ts",
+      "restoreEvidencePath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\control\\restore-result.json"
+    },
+    "metaSha256": "c80d019748bebc5c244587c82e255d7aabc243cb238e74328d181537208d49f1",
+    "sourceManifestSha256": "e6ec13e3ba52a32971834f6882c3dcd2f56949e2b86bfafb93a38c1a769acc8d",
+    "buildManifestSha256": "fb21d0be4feffbbfb18a037df54cd7fee97cdd7420497af1f26ca75167512cdf",
+    "restore": {
+      "schemaVersion": 1,
+      "restoreStatus": "verified",
+      "restoredAt": "2026-09-04T10:40:36Z",
+      "restoredWorkspaceFingerprint": "98d9cbcd029b97eadf14037e19ffbc80dd4bbdb6c702174a5b3cf99e8582287e",
+      "restoredTreeFingerprint": "ba4e5fba17935348b81760e28711f3fdf31456784a6dca8ad79123607982e44e",
+      "restoredStatus": " M workbuddy/src/main/db/repositories/flowGoalRepo.ts\n M workbuddy/src/main/db/repositories/flowWeekRepo.ts\n M workbuddy/src/main/ipc/flow.ipc.ts\n M workbuddy/src/main/services/flowActions.ts\n M workbuddy/src/main/services/flowReviewDerived.ts\n M workbuddy/src/preload/index.ts\n M workbuddy/src/renderer/src/components/flow/FixedDefsPanel.vue\n M workbuddy/src/renderer/src/components/flow/review/ReviewTaskList.vue\n M workbuddy/src/renderer/src/composables/useFlowWeek.ts\n M workbuddy/src/renderer/src/views/flow/FlowWeekView.vue\n M workbuddy/src/shared/flowTypes.ts\n M workbuddy/tests/flowRepos.spec.ts\n M workbuddy/tests/reviewComponents.spec.ts\n?? workbuddy/tests/fixedDefRetirement.spec.ts\n?? workbuddy/tests/fixedDefsPanel.spec.ts\n?? workbuddy/tests/preloadFlowFixedDefs.spec.ts\n?? workbuddy/tests/r1Fix1.spec.ts",
+      "expectedWorkspaceFingerprint": "98d9cbcd029b97eadf14037e19ffbc80dd4bbdb6c702174a5b3cf99e8582287e",
+      "expectedStatus": " M workbuddy/src/main/db/repositories/flowGoalRepo.ts\n M workbuddy/src/main/db/repositories/flowWeekRepo.ts\n M workbuddy/src/main/ipc/flow.ipc.ts\n M workbuddy/src/main/services/flowActions.ts\n M workbuddy/src/main/services/flowReviewDerived.ts\n M workbuddy/src/preload/index.ts\n M workbuddy/src/renderer/src/components/flow/FixedDefsPanel.vue\n M workbuddy/src/renderer/src/components/flow/review/ReviewTaskList.vue\n M workbuddy/src/renderer/src/composables/useFlowWeek.ts\n M workbuddy/src/renderer/src/views/flow/FlowWeekView.vue\n M workbuddy/src/shared/flowTypes.ts\n M workbuddy/tests/flowRepos.spec.ts\n M workbuddy/tests/reviewComponents.spec.ts\n?? workbuddy/tests/fixedDefRetirement.spec.ts\n?? workbuddy/tests/fixedDefsPanel.spec.ts\n?? workbuddy/tests/preloadFlowFixedDefs.spec.ts\n?? workbuddy/tests/r1Fix1.spec.ts",
+      "introducedFilesRemoved": [],
+      "scope": "tracked-and-non-ignored-files-under-code-root"
+    },
+    "sourceManifestMatches": true,
+    "buildManifestMatches": true,
+    "fileCount": 100,
+    "totalBytes": 335402370,
+    "addedOrMissingFiles": [],
+    "mismatches": [],
+    "launcher": "@echo off\r\nsetlocal\r\nset \"ROOT=%~dp0\"\r\nset \"USER_DATA=%ROOT%userData\"\r\nif not exist \"%USER_DATA%\" mkdir \"%USER_DATA%\"\r\necho Launch command: app\\WorkBuddy.exe\r\nif exist \"%ROOT%app\\WorkBuddy.exe\" start \"\" \"%ROOT%app\\WorkBuddy.exe\" --user-data-dir=\"%USER_DATA%\"\r\nif not exist \"%ROOT%app\\WorkBuddy.exe\" echo Missing launch target: %ROOT%app\\WorkBuddy.exe\r\nendlocal\r\n",
+    "launcherSha256": "2dbaec2a3ca53d874842749c1986f52c390e3d6d8d30ea6379d76c6b3fab71a3"
+  }
+}

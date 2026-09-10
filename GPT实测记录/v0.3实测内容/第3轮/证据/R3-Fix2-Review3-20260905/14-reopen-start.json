@@ -1,0 +1,21 @@
+{
+  "reviewId": "Review3",
+  "observedAt": "2026-09-05T09:02:28.822Z",
+  "window": {
+    "app": "process:E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "id": 11472218,
+    "title": "WorkBuddy"
+  },
+  "accessibility": {
+    "focused_element": "1 文档 ID: 692688",
+    "tree": "Window: \"WorkBuddy\", App: WorkBuddy.exe.\n\t0 窗格 WorkBuddy Secondary Actions: Raise\n\t\t1 文档 ID: 692688\n\t\t2 窗格 (disabled)\n\t\t3 标题栏\n\t\t\t4 菜单栏 系统 ID: MenuBar\n\t\t\t\t5 菜单项目 系统\n\t\t\t6 按钮 最小化\n\t\t\t7 按钮 最大化\n\t\t\t8 按钮 关闭\n\t\t9 窗格\n\t\t\t10 窗格\n\t\t\t\t11 窗格\n\t\t\t\t\t12 窗格\n\t\t\t\t\t\t13 窗格\n\t\t\t\t\t\t\t14 窗格\n\t\t\t\t\t\t\t15 窗格\n\nThe focused UI element is 1 文档 ID: 692688."
+  },
+  "screenshots": [
+    {
+      "name": "14-reopen-start-0.jpg",
+      "id": "screenshot-0",
+      "width": 1186,
+      "height": 793
+    }
+  ]
+}

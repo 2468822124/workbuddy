@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "planId": "R1-4",
+  "testPoint": "R1-4-T01",
+  "scenario": "User opened the formal entry; GPT window acquisition retry",
+  "observedAt": "2026-09-08T21:43:00+08:00",
+  "userReported": "窗口已打开",
+  "formalEntry": "E:\\workbuddy-test\\R1-4-S2\\启动R1-4实测.bat",
+  "role": "GPT",
+  "processObservation": {
+    "processes": "R1-4 S2 WorkBuddy processes were present",
+    "pathCategory": "E:\\workbuddy-test\\R1-4-S2\\app\\WorkBuddy.exe",
+    "topLevelWindowHandleFromExecutionEnvironment": 0,
+    "windowTitleFromExecutionEnvironment": ""
+  },
+  "cuaObservation": {
+    "state": "apps=[]; only Codex in-app browser surface returned",
+    "nativeWindowBinding": "unavailable",
+    "screenshot": "not available",
+    "accessibilityTree": "not available"
+  },
+  "interpretation": "The user may have a visible window in their desktop surface, but this GPT execution environment cannot observe or bind it. This is an environment/tooling gap, not a product result.",
+  "businessActionsSent": false,
+  "status": "blocked",
+  "requiredRecovery": "Enable/provide a native Windows Computer Use surface for this task, then re-enumerate the current WorkBuddy window. Do not switch to B1/S1, direct exe, hidden DOM, IPC, or database actions."
+}

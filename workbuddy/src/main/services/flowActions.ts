@@ -3,6 +3,7 @@ import { flowWeekRepo } from '../db/repositories/flowWeekRepo'
 import { flowDayRepo } from '../db/repositories/flowDayRepo'
 import { flowVoucherRepo } from '../db/repositories/flowVoucherRepo'
 import { projectTaskRepo } from '../db/repositories/projectTaskRepo'
+import { runInTransaction } from '../db/repositories/unitOfWork'
 import { getWeekStart, addDays } from '@shared/period'
 import { completionOf, InstanceAggregate } from './flowDerived'
 import { ok, err, Result } from '../lib/result'
@@ -85,9 +86,29 @@ export function saveFixedDef(input: {
   }
 }
 
-export function deleteFixedDef(id: number): Result<{ ok: boolean }> {
+export function deleteFixedDef(id: number, effectiveWeekStart: string): Result<{ ok: boolean }> {
   try {
-    return ok({ ok: flowFixedRepo.softDelete(id) })
+    if (!isValidDate(effectiveWeekStart)) return err('INVALID_INPUT', 'weekStart 非法日期')
+    const normalizedWeekStart = getWeekStart(effectiveWeekStart)
+    let deleted = false
+
+    // 停用与未来未进入实例清理必须原子完成；历史凭据与日任务只读，不做物理删除。
+    runInTransaction(() => {
+      deleted = flowFixedRepo.softDelete(id)
+      const futureInstances = flowWeekRepo.listActiveByFixedDefAfter(id, normalizedWeekStart)
+      const entries = flowDayRepo.findByInstanceIds(futureInstances.map(inst => inst.id))
+      const enteredInstanceIds = new Set(
+        entries
+          .map(entry => entry.weekInstanceId)
+          .filter((instanceId): instanceId is number => instanceId !== null),
+      )
+
+      for (const instance of futureInstances) {
+        if (!enteredInstanceIds.has(instance.id)) flowWeekRepo.softDelete(instance.id)
+      }
+    })
+
+    return ok({ ok: deleted })
   } catch (e: unknown) {
     logger.error('flowActions.deleteFixedDef failed', e)
     return err('INTERNAL', (e as Error).message)

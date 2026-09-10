@@ -255,7 +255,11 @@ export function useFlowWeek() {
       return runAction(() => api.flow.fixedDefs.save(input), '已保存（物化后本周出现实例）')
     },
     deleteFixedDef(id: number) {
-      return runAction(() => api.flow.fixedDefs.delete(id), '已停用（存量保留）')
+      const effectiveWeekStart = weekStart.value
+      return runAction(
+        () => api.flow.fixedDefs.delete(id, effectiveWeekStart),
+        `已停用（${effectiveWeekStart} 起生效；生效周及已进入日任务的存量保留）`,
+      )
     },
   }
 }

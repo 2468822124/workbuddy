@@ -1,0 +1,42 @@
+{
+  "executedAt": "2026-09-02T15:40:42.662Z",
+  "candidate": "R1-Fix2-only",
+  "reviewId": "Review2",
+  "readonly": true,
+  "queryOnly": {
+    "query_only": 0
+  },
+  "integrity": [
+    {
+      "integrity_check": "ok"
+    }
+  ],
+  "foreignKeyCheck": [],
+  "flow_week_instances": [
+    {
+      "id": 1,
+      "weekStart": "2026-08-24",
+      "title": "R1-Fix2-U7-Review-20260902",
+      "origin": "temp",
+      "fixedDefId": null,
+      "skippedAt": null,
+      "carriedFrom": null,
+      "isDeleted": 0
+    },
+    {
+      "id": 2,
+      "weekStart": "2026-08-31",
+      "title": "R1-Fix2-U7-Review-20260902",
+      "origin": "temp",
+      "fixedDefId": null,
+      "skippedAt": null,
+      "carriedFrom": 1,
+      "isDeleted": 0
+    }
+  ],
+  "flow_day_entries": [],
+  "flow_vouchers": [],
+  "hashBefore": "14948FA5E2D8F2D2F9D9F9349A2626F275B36C870D724B183D7C9216D676F20E",
+  "hashAfter": "14948FA5E2D8F2D2F9D9F9349A2626F275B36C870D724B183D7C9216D676F20E",
+  "hashUnchanged": true
+}

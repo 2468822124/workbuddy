@@ -83,6 +83,10 @@ const badgeOf = (inst: FlowWeekInstance): string | null => fixedBadge(inst, fixe
 const vouchersOfInst = (inst: FlowWeekInstance) => vouchersOf(inst.id, board.value?.vouchers ?? [])
 const titleOf = (f: FlowWeekFocus): string => focusDisplayTitle(f, monthGoalMap.value)
 const transferredOf = (f: FlowWeekFocus): boolean => hasTransferred(f, board.value?.instances ?? [])
+
+/** R1 Fix2（U-7）：board 逐行 carried（已存在 active 承接实例）→ 行内收敛 + 转周入口随生命周期消失 */
+const carriedOf = (inst: FlowWeekInstance): boolean =>
+  (board.value?.instances ?? []).some(i => i.id === inst.id && i.carried)
 </script>
 
 <template>
@@ -116,6 +120,7 @@ const transferredOf = (f: FlowWeekFocus): boolean => hasTransferred(f, board.val
         />
         <FixedDefsPanel
           :fixed-defs="fixedDefs"
+          :effective-week-start="weekStart"
           @create="saveFixedDef($event)"
           @save="saveFixedDef($event)"
           @delete="deleteFixedDef($event)"
@@ -128,6 +133,7 @@ const transferredOf = (f: FlowWeekFocus): boolean => hasTransferred(f, board.val
           :completions="completions"
           :badge-of="badgeOf"
           :vouchers-of="vouchersOfInst"
+          :carried-of="carriedOf"
           :is-history="isHistoryWeek(weekStart, today)"
           @create="(title, kind, targetCount) => createTemp(title, kind, targetCount)"
           @rename="(id, title) => renameInstance(id, title)"

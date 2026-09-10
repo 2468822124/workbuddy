@@ -99,8 +99,8 @@ const api = {
       save(data: { id?: number; title: string; kind: string; targetCount?: number; weekdayMask?: number; note?: string | null }): Promise<Result<FlowFixedDef>> {
         return ipcRenderer.invoke(IPC.FLOW_FIXED_DEFS_SAVE, data)
       },
-      delete(id: number): Promise<Result<{ ok: boolean }>> {
-        return ipcRenderer.invoke(IPC.FLOW_FIXED_DEFS_DELETE, { id })
+      delete(id: number, weekStart: string): Promise<Result<{ ok: boolean }>> {
+        return ipcRenderer.invoke(IPC.FLOW_FIXED_DEFS_DELETE, { id, weekStart })
       },
     },
     instance: {

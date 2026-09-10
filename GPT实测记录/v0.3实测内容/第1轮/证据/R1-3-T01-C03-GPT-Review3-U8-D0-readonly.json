@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-03T02:33:27.267Z",
+  "readOnly": true,
+  "databasePath": "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\R1-3\\USER-20260903\\userData\\workbuddy.db",
+  "databaseSha256Before": "FD0E2C7729EFD4E5224910B2A76D3FFFF46981EA7A58D0B320DF7695767C5698",
+  "databaseSha256After": "FD0E2C7729EFD4E5224910B2A76D3FFFF46981EA7A58D0B320DF7695767C5698",
+  "hashUnchanged": true,
+  "integrity": [
+    {
+      "integrity_check": "ok"
+    }
+  ],
+  "foreignKeyCheck": [],
+  "nickname": "v0.3-R1-3-USER-20260903-BOOT1",
+  "flowCounts": {
+    "flow_week_instances": 0,
+    "flow_day_entries": 0,
+    "flow_vouchers": 0
+  },
+  "walExists": true,
+  "shmExists": true
+}

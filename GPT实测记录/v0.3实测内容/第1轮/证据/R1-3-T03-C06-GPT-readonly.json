@@ -1,0 +1,80 @@
+{
+  "testPoint": "R1-3-T03-C06",
+  "executedBy": "GPT",
+  "executedAt": "2026-08-30T23:49:49.469+08:00",
+  "readonly": true,
+  "queryOnly": 1,
+  "databaseId": "B1-20260829/R1-3/GPT-20260830/workbuddy.db",
+  "prefix": "v0.3-R1-3-GPT-20260830",
+  "integrity": "ok",
+  "foreignKeyCheck": "ok",
+  "hashBefore": "FA2F77D859E449F754023EA25FB9E1E566B6C6349B8D0D03046C1277888906C2",
+  "hashAfter": "FA2F77D859E449F754023EA25FB9E1E566B6C6349B8D0D03046C1277888906C2",
+  "hashUnchanged": true,
+  "prefixCounts": {
+    "flow_month_goals": 1,
+    "flow_week_focus": 1,
+    "flow_week_instances": 5,
+    "flow_day_entries": 1,
+    "flow_vouchers": 3
+  },
+  "activePrefixCounts": {
+    "flow_month_goals": 1,
+    "flow_week_focus": 1,
+    "flow_week_instances": 5,
+    "flow_day_entries": 1,
+    "flow_vouchers": 3
+  },
+  "h1": {
+    "sourceRows": [
+      {
+        "id": 2,
+        "weekStart": "2026-08-17",
+        "title": "v0.3-R1-3-GPT-20260830-H1 历史未完成任务",
+        "carriedFrom": null,
+        "isDeleted": 0
+      }
+    ],
+    "activeCarryRows": [
+      {
+        "id": 3,
+        "weekStart": "2026-08-24",
+        "title": "v0.3-R1-3-GPT-20260830-H1 历史未完成任务",
+        "carriedFrom": 2,
+        "isDeleted": 0
+      }
+    ],
+    "activeCarryCount": 1
+  },
+  "h2": {
+    "sourceRows": [
+      {
+        "id": 4,
+        "weekStart": "2026-08-17",
+        "title": "v0.3-R1-3-GPT-20260830-H2 受控重复点击任务",
+        "carriedFrom": null,
+        "isDeleted": 0
+      }
+    ],
+    "activeCarryRows": [
+      {
+        "id": 5,
+        "weekStart": "2026-08-24",
+        "title": "v0.3-R1-3-GPT-20260830-H2 受控重复点击任务",
+        "carriedFrom": 4,
+        "isDeleted": 0
+      }
+    ],
+    "activeCarryCount": 1
+  },
+  "carriedRelations": [
+    { "carryId": 3, "carryTitle": "v0.3-R1-3-GPT-20260830-H1 历史未完成任务", "carryWeekStart": "2026-08-24", "carriedFrom": 2 },
+    { "carryId": 5, "carryTitle": "v0.3-R1-3-GPT-20260830-H2 受控重复点击任务", "carryWeekStart": "2026-08-24", "carriedFrom": 4 }
+  ],
+  "dataChangedByReadonlyCheck": false,
+  "interpretation": {
+    "h1": "W-1 源 id=2 与 W0 active 承接 id=3 一一对应；该承接来自此前误入口操作，C02/C03 不据此判通过。",
+    "h2": "W-1 源 id=4 与 W0 active 承接 id=5 一一对应；C05 受控双击最多产生一条有效承接。",
+    "scope": "仅查询本计划 GPT 前缀；未写入、更新、删除或修复任何业务行。"
+  }
+}

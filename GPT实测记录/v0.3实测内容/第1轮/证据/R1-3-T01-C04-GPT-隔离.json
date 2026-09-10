@@ -1,0 +1,58 @@
+{
+  "testPoint": "R1-3-T01-C04",
+  "executedBy": "GPT",
+  "observedAt": [
+    "2026-08-30T22:51:02+08:00",
+    "2026-08-30T22:54:26+08:00"
+  ],
+  "readonlyChecks": true,
+  "snapshot": {
+    "qa": "QA1",
+    "snapshotId": "S1",
+    "packageVersion": "0.3.0-qa.1",
+    "exeSha256": "EEC94A500952CC83A15A9BE1907B0059D8A6262BE63503FA9E54F94716011874",
+    "manifestSha256": "0044A2AE3A0075C3733748006308FD3E5F05B19388C5CDEAF02C584DA94FE581"
+  },
+  "entry": {
+    "roleSelector": "E:\\workbuddy-test\\选择B1实测角色.bat",
+    "officialEntry": "E:\\workbuddy-test\\启动实测.bat",
+    "plan": "R1-3",
+    "role": "GPT",
+    "date": "20260830",
+    "prefix": "v0.3-R1-3-GPT-20260830"
+  },
+  "sourceRecords": [
+    "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\entry\\selected-role.ini",
+    "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\entry\\启动实测.log",
+    "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\entry\\evidence\\B1-entry-once-preflight.json"
+  ],
+  "runtime": {
+    "appPath": "E:\\workbuddy-test\\app-v0.3\\WorkBuddy.exe",
+    "userDataId": "B1-20260829/R1-3/GPT-20260830/userData",
+    "databaseId": "B1-20260829/R1-3/GPT-20260830/userData/workbuddy.db",
+    "workbuddyUserDataMatchedRole": true,
+    "processPathMatchedApp": true,
+    "databaseUnderRoleData": true
+  },
+  "gui": {
+    "windowTitle": "WorkBuddy",
+    "prefixObserved": "v0.3-R1-3-GPT-20260830-BOOT1",
+    "boot1Observed": true,
+    "sameRoleReentryObserved": true,
+    "stableAfterActions": true,
+    "waitPolicy": "每次动作后重新观察至标题/关键文本稳定；未记录超过2s超时"
+  },
+  "closure": {
+    "visibleWorkBuddyWindowsAfterClose": 0,
+    "workbuddyProcessesAfterClose": 0
+  },
+  "realUserData": {
+    "boundary": "%APPDATA%\\workbuddy\\",
+    "access": "not-read/not-written/not-deleted"
+  },
+  "evidence": [
+    "R1-3-T01-C04-GPT-启动.png",
+    "R1-3-T01-C04-GPT-重进.png"
+  ],
+  "scopeNote": "只验证计划批准的角色选择器+正式 bat 入口；不执行计划明确排除的直接双击 exe。"
+}

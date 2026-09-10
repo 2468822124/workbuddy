@@ -1,0 +1,18 @@
+{
+  "reviewId": "Review3",
+  "observedAt": "2026-09-05T07:15:11.340Z",
+  "window": {
+    "app": "process:E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "id": 396442,
+    "title": "WorkBuddy"
+  },
+  "accessibility": null,
+  "screenshots": [
+    {
+      "name": "10-leave-to-today-0.jpg",
+      "id": "screenshot-0",
+      "width": 1186,
+      "height": 776
+    }
+  ]
+}

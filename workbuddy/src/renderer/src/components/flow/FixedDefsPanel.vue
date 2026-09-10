@@ -6,6 +6,7 @@ import type { FlowFixedDef } from '@shared/flowTypes'
 
 const props = defineProps<{
   fixedDefs: FlowFixedDef[]
+  effectiveWeekStart: string
 }>()
 
 const emit = defineEmits<{
@@ -148,12 +149,15 @@ function dayLabels(d: FlowFixedDef): string {
             <button
               v-if="confirmId !== d.id"
               class="tiny-btn danger"
-              title="停用：不再克隆，存量实例保留"
+              :title="`从 ${effectiveWeekStart} 起停用；生效周和已进入日任务的存量保留`"
               @click="confirmId = d.id"
             >
               停用
             </button>
             <template v-else>
+              <span class="confirm-hint">
+                从 {{ effectiveWeekStart }} 起；生效周和已进入日任务的存量保留，未进入的未来实例隐藏
+              </span>
               <button class="tiny-btn danger solid" @click="emit('delete', d.id); confirmId = null">确认停用</button>
               <button class="tiny-btn" @click="confirmId = null">取消</button>
             </template>
@@ -253,6 +257,7 @@ function dayLabels(d: FlowFixedDef): string {
 .def-title { font-size: var(--fs-body); color: var(--text-strong); flex: 1; min-width: 0; }
 .days { font-size: var(--fs-caption); color: var(--text-muted); flex-shrink: 0; }
 .def-actions { display: flex; gap: var(--s1); flex-shrink: 0; }
+.confirm-hint { font-size: var(--fs-caption); color: var(--danger); align-self: center; }
 .tiny-btn {
   font-family: inherit; font-size: var(--fs-caption);
   color: var(--text-muted); background: transparent;

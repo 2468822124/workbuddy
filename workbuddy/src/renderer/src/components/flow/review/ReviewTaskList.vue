@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import type { FlowReviewTask } from '@shared/flowTypes'
 
@@ -17,22 +17,45 @@ const emit = defineEmits<{ carry: [id: number] }>()
 /** 行内确认（F3）：点「转下周」先展开确认条，确认后才 emit carry；取消恢复原样 */
 const confirmId = ref<number | null>(null)
 
+// R1 Fix1（U-3）：前端防重复提交 —— 父级 carryingId 要等一次渲染才生效，
+// 同 tick 连点会重复 emit；本地立即置位拦截，动作结束（carryingId 归零）后解除以便失败重试。
+const submittedId = ref<number | null>(null)
+
+watch(
+  [() => props.carryingId, () => props.tasks],
+  () => {
+    if (props.carryingId === null) submittedId.value = null
+    // 转周成功后列表刷新为 carried → 该行不再可转，收起残留的确认条
+    if (confirmId.value !== null && !props.tasks.some(t => t.id === confirmId.value && t.carryable)) {
+      confirmId.value = null
+    }
+  },
+)
+
 function ask(id: number): void {
   confirmId.value = id
+  submittedId.value = null
 }
 
 function cancelConfirm(): void {
   confirmId.value = null
+  submittedId.value = null
 }
 
 function confirmCarry(id: number): void {
+  if (props.carryingId !== null || submittedId.value !== null) return
+  submittedId.value = id
   emit('carry', id) // 动作中父级 carryingId 驱动禁用；失败后确认条保留可重试
 }
 
-/** 状态徽标文案：done → 已完成；unfinished → 未完成；skipped → 已跳过 */
-function statusText(status: FlowReviewTask['status']): string {
-  if (status === 'done') return '已完成'
-  if (status === 'skipped') return '已跳过'
+/**
+ * 状态徽标文案：done → 已完成；skipped → 已跳过；
+ * R1 Fix1（U-3）carried → 已转下周（历史项保留但不再是待办）；其余 → 未完成
+ */
+function statusText(t: FlowReviewTask): string {
+  if (t.carried) return '已转下周'
+  if (t.status === 'done') return '已完成'
+  if (t.status === 'skipped') return '已跳过'
   return '未完成'
 }
 </script>
@@ -46,16 +69,16 @@ function statusText(status: FlowReviewTask['status']): string {
 
     <div v-if="tasks.length === 0" class="empty">本周无任务</div>
     <ul v-else class="rows">
-      <li v-for="t in tasks" :key="t.id" class="row" :class="t.status">
+      <li v-for="t in tasks" :key="t.id" class="row" :class="[t.status, { carried: t.carried }]">
         <div class="title-col">
-          <span class="dot" :class="t.status" />
+          <span class="dot" :class="[t.status, { carried: t.carried }]" />
           <span class="name">{{ t.title }}</span>
           <span v-if="t.origin === 'fixed'" class="badge">固定</span>
           <span v-if="t.kind === 'multi'" class="badge">多次 · {{ t.completion.doneCount }}/{{ t.targetCount }}</span>
-          <span v-if="t.unarranged" class="badge warn">未安排</span>
+          <span v-if="t.unarranged && !t.carried" class="badge warn">未安排</span>
         </div>
         <div class="status">
-          <span class="chip" :class="t.status">{{ statusText(t.status) }}</span>
+          <span class="chip" :class="[t.status, { carried: t.carried }]">{{ statusText(t) }}</span>
           <template v-if="t.carryable && isClosed">
             <template v-if="confirmId === t.id">
               <span class="confirm-text">确认转为下周一次性任务？</span>
@@ -118,10 +141,14 @@ function statusText(status: FlowReviewTask['status']): string {
 }
 .row.done .name { text-decoration: line-through; color: var(--text-muted); }
 .row.skipped .name { color: var(--text-muted); }
+/* R1 Fix1（U-3）：已转下周的历史项保留但划掉变灰，与待办明确区分 */
+.row.carried { opacity: .6; }
+.row.carried .name { text-decoration: line-through; color: var(--text-muted); }
 .dot { width: 8px; height: 8px; border-radius: var(--r-pill); flex: none; }
 .dot.done { background: var(--ok); }
 .dot.unfinished { background: var(--warn); }
 .dot.skipped { background: var(--text-faint); }
+.dot.carried { background: var(--text-faint); }
 .badge {
   flex: none;
   font-size: var(--fs-caption);
@@ -142,6 +169,7 @@ function statusText(status: FlowReviewTask['status']): string {
 .chip.done { color: var(--ok); background: var(--ok-soft); }
 .chip.unfinished { color: var(--warn); background: var(--warn-soft); }
 .chip.skipped { color: var(--text-muted); background: var(--bg-hover); }
+.chip.carried { color: var(--text-muted); background: var(--bg-hover); }
 .carry-btn {
   display: inline-flex;
   align-items: center;

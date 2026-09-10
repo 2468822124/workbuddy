@@ -1,0 +1,78 @@
+{
+  "reviewId": "Review3",
+  "capturedAt": "2026-09-05T07:15:00.451Z",
+  "archive": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\resources\\app.asar",
+  "archiveSha256": "4cabace0131a9a35d6187c763920749ea3f66b3aaad12632181de2db17bd7925",
+  "package": {
+    "name": "workbuddy",
+    "version": "0.3.0-c0",
+    "description": "AI 原生个人工作台 — WorkBuddy",
+    "main": "./out/main/index.js",
+    "dependencies": {
+      "better-sqlite3": "^11.7.0",
+      "dompurify": "^3.2.4",
+      "lucide-vue-next": "^0.447.0",
+      "marked": "^15.0.12",
+      "rss-parser": "^3.13.0",
+      "vue": "^3.5.13",
+      "vue-router": "^4.5.0"
+    }
+  },
+  "deleteFixedDef": {
+    "path": "out/main/index.js",
+    "startLine": 2663,
+    "text": "function deleteFixedDef(id, effectiveWeekStart) {\n  try {\n    if (!isValidDate(effectiveWeekStart)) return err(\"INVALID_INPUT\", \"weekStart 非法日期\");\n    const normalizedWeekStart = getWeekStart(effectiveWeekStart);\n    let deleted = false;\n    runInTransaction(() => {\n      deleted = flowFixedRepo.softDelete(id);\n      const futureInstances = flowWeekRepo.listActiveByFixedDefAfter(id, normalizedWeekStart);\n      const entries = flowDayRepo.findByInstanceIds(futureInstances.map((inst) => inst.id));\n      const enteredInstanceIds = new Set(\n        entries.map((entry) => entry.weekInstanceId).filter((instanceId) => instanceId !== null)\n      );\n      for (const instance of futureInstances) {\n        if (!enteredInstanceIds.has(instance.id)) flowWeekRepo.softDelete(instance.id);\n      }\n    });\n    return ok({ ok: deleted });\n  } catch (e) {\n    logger.error(\"flowActions.deleteFixedDef failed\", e);\n    return err(\"INTERNAL\", e.message);\n  }\n}\nfunction createTempInstance(input) {\n  try {\n    const title = (input.title ?? \"\").trim();\n    if (!title) return err(\"INVALID_INPUT\", \"周任务标题不能为空\");\n    if (!isValidDate(input.weekStart)) return err(\"INVALID_INPUT\", \"weekStart 非法日期\");\n    if (input.kind !== \"once\" && input.kind !== \"multi\") return err(\"INVALID_INPUT\", \"kind 非法\");\n    const inst = flowWeekRepo.create({\n      weekStart: getWeekStart(input.weekStart),\n      origin: \"temp\",\n      fixedDefId: null,"
+  },
+  "fixedDefsStyles": {
+    "path": "out/renderer/assets/FlowWeekView-Dlw9l3wC.css",
+    "rules": [
+      "\n.def-row[data-v-684664a8] {\n  display: flex;\n  align-items: center;\n  gap: var(--s3);\n  padding: var(--s3) var(--s4);\n  border-radius: var(--r-md);\n  transition: background var(--dur-fast);\n}",
+      "\n.def-row[data-v-684664a8]:hover { background: var(--bg-hover);\n}",
+      "\n.def-title[data-v-684664a8] { font-size: var(--fs-body); color: var(--text-strong); flex: 1; min-width: 0;\n}",
+      "\n.def-actions[data-v-684664a8] { display: flex; gap: var(--s1); flex-shrink: 0;\n}",
+      "\n.confirm-hint[data-v-684664a8] { font-size: var(--fs-caption); color: var(--danger); align-self: center;\n}"
+    ]
+  },
+  "confirmationTemplate": {
+    "path": "out/renderer/assets/FlowWeekView-DX4yuWAZ.js",
+    "text": "tiny-btn danger\",\n                    title: `从 ${__props.effectiveWeekStart} 起停用；生效周和已进入日任务的存量保留`,\n                    onClick: ($event) => confirmId.value = d.id\n                  }, \" 停用 \", 8, _hoisted_21)) : (openBlock(), createElementBlock(Fragment, { key: 1 }, [\n                    createBaseVNode(\"span\", _hoisted_22, \" 从 \" + toDisplayString(__props.effectiveWeekStart) + \" 起；生效周和已进入日任务的存量保留，未进入的未来实例隐藏 \", 1),\n                    createBaseVNode(\"button\", {\n                      class: \"tiny-btn danger solid\",\n                      onClick: ($event) => {\n                        emit(\"delete\", d.id);\n                        confirmId.value = null;\n                      }\n                    }, \"确认停用\", 8, _hoisted_23),\n                    createBaseVNode(\"button\", {\n                      class: \"tiny-btn\",\n                      onClick: _cache[6] || (_cache[6] = ($event) => confirmId.value = null)\n                    }, \"取消\")\n        "
+  },
+  "localSourceReference": {
+    "path": "E:/workspace/workbuddy/src/renderer/src/components/flow/FixedDefsPanel.vue",
+    "sha256": "042be1cf3ea2573614d3f26eaa131934db713286062bee1fdec70356b8dae500",
+    "candidateExpected": {
+      "path": "src/renderer/src/components/flow/FixedDefsPanel.vue",
+      "sha256": "3daaa4c93f2060dee25b026f7f38bb0b466f5243e0557a28eda66ef1c24a9110",
+      "size": 10965,
+      "mode": 438
+    },
+    "note": "The restored source is a navigation reference; packaged extracts above are candidate evidence."
+  },
+  "protectedFiles": [
+    {
+      "path": "E:/workspace/用户实测阶段/v0.3-任务数据流通重构/第3轮/v0.3-R3-停用后固定任务未来周边界-全流程闭环记录.md",
+      "bytes": 90583,
+      "sha256": "506754c7bda7acf7e6848c6f25c9cc9cbb355ff432127561c93a966ecd8aea02"
+    },
+    {
+      "path": "E:/workspace/当前代码状态.md",
+      "bytes": 10396,
+      "sha256": "07223c4039c3994317cd235699a39cb9a638c860a1558980b62e404d94ebc2e3"
+    },
+    {
+      "path": "E:/workspace/用户实测阶段/v0.3-任务数据流通重构/第2轮/v0.3-R2-1-实测计划.md",
+      "bytes": 72295,
+      "sha256": "d562ef0316359df762ef7e277b9e1edcd90aca9a35f002f2d35180a4d8f537b7"
+    },
+    {
+      "path": "E:/workspace/用户实测阶段/v0.3-任务数据流通重构/第2轮/v0.3-R2-月目标重复选取-全流程闭环记录.md",
+      "bytes": 124451,
+      "sha256": "d844fe72af38c27bfe0645d851e8ce01f346dae2d8a57cb1bb524891b06c305f"
+    },
+    {
+      "path": "E:/workspace/GPT实测记录/v0.3实测内容/第2轮/v0.3-R2-1-GPT实测.md",
+      "bytes": 28848,
+      "sha256": "3b35cbbc9c780d5cfcdedf07fc6cff50709cd85817d8e62e723dde26e5082e7e"
+    }
+  ]
+}

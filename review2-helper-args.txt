@@ -1,0 +1,6 @@
+[
+  "D:\\node\\node.exe",
+  "E:\\workspace\\review2-readonly-helper.cjs",
+  "E:\\workbuddy-test\\R1-3&R2-1\\B1-20260829\\R2-1\\GPT-20260903\\userData\\workbuddy.db",
+  "E:\\workspace\\GPT实测记录\\v0.3实测内容\\第2轮\\证据\\R2-1-T05-T06-GPT-20260903-readonly.json"
+]

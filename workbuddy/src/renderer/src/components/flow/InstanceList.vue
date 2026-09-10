@@ -12,6 +12,8 @@ const props = defineProps<{
   badgeOf: (inst: FlowWeekInstance) => string | null
   /** 本实例凭据（凭据弹层数据源） */
   vouchersOf: (inst: FlowWeekInstance) => FlowVoucherView[]
+  /** 已转出判定（board 逐行 carried → 该实例已存在 active 承接实例） */
+  carriedOf: (inst: FlowWeekInstance) => boolean
   /** 历史周 → 行内显示「转下周」 */
   isHistory: boolean
 }>()
@@ -99,6 +101,7 @@ const sortedInstances = computed(() => {
         :completion="completions[inst.id]"
         :badge="badgeOf(inst)"
         :is-history="isHistory"
+        :carried="carriedOf(inst)"
         :vouchers="vouchersOf(inst)"
         @rename="(id, title) => emit('rename', id, title)"
         @rename-guide="emit('renameGuide')"

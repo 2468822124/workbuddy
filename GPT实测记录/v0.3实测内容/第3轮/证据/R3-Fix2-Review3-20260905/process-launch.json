@@ -1,0 +1,26 @@
+[
+  {
+    "ProcessId": 13092,
+    "ParentProcessId": 31968,
+    "ExecutablePath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "CommandLine": "\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe\"  --user-data-dir=\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\userData\""
+  },
+  {
+    "ProcessId": 31412,
+    "ParentProcessId": 13092,
+    "ExecutablePath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "CommandLine": "\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe\" --type=gpu-process --user-data-dir=\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\userData\" --gpu-preferences=UAAAAAAAAADgAAAEAAAAAAAAAAAAAAAAAABgAAEAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAA --field-trial-handle=1688,i,18215080032180460728,5527344762558481069,262144 --disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --mojo-platform-channel-handle=1680 /prefetch:2"
+  },
+  {
+    "ProcessId": 16336,
+    "ParentProcessId": 13092,
+    "ExecutablePath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "CommandLine": "\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --lang=zh-CN --service-sandbox-type=none --user-data-dir=\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\userData\" --field-trial-handle=2152,i,18215080032180460728,5527344762558481069,262144 --disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --mojo-platform-channel-handle=2000 /prefetch:11"
+  },
+  {
+    "ProcessId": 29292,
+    "ParentProcessId": 13092,
+    "ExecutablePath": "E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "CommandLine": "\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe\" --type=renderer --user-data-dir=\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\userData\" --app-path=\"E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\resources\\app.asar\" --no-sandbox --no-zygote --video-capture-use-gpu-memory-buffer --lang=zh-CN --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=4 --time-ticks-at-unix-epoch=-1788583253122949 --launch-time-ticks=17142719233 --field-trial-handle=2484,i,18215080032180460728,5527344762558481069,262144 --disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand --variations-seed-version --mojo-platform-channel-handle=2480 /prefetch:1"
+  }
+]

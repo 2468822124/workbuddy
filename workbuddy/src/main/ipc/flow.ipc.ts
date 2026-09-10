@@ -67,9 +67,11 @@ export function registerFlowIpc(): void {
     if (!input || typeof input.title !== 'string') return err('INVALID_INPUT', 'title 必填')
     return saveFixedDef(input as Parameters<typeof saveFixedDef>[0])
   })
-  ipcMain.handle(IPC.FLOW_FIXED_DEFS_DELETE, (_e, input: { id?: number }) => {
-    if (!input || typeof input.id !== 'number') return err('INVALID_INPUT', 'id 必填')
-    return deleteFixedDef(input.id)
+  ipcMain.handle(IPC.FLOW_FIXED_DEFS_DELETE, (_e, input: { id?: number; weekStart?: string }) => {
+    if (!input || typeof input.id !== 'number' || !validDate(input.weekStart)) {
+      return err('INVALID_INPUT', 'id/weekStart 必填')
+    }
+    return deleteFixedDef(input.id, input.weekStart as string)
   })
 
   // ===== 周任务实例 =====

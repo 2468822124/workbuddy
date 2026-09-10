@@ -139,10 +139,98 @@ describe('ReviewTaskList 组件运行', () => {
       skippedAt: null, carriedFrom: null, isDeleted: false, deletedAt: null,
       createdAt: '2026-08-01', updatedAt: '2026-08-01',
       completion: { instanceId: 1, done: false, doneCount: 0, targetCount: 1, arrangedCount: 0, skipped: false },
-      status: 'unfinished', arranged: false, unarranged: true, carryable: true,
+      status: 'unfinished', arranged: false, unarranged: true, carried: false, carryable: true,
       ...overrides,
     }
   }
+
+  // ===== R1 Fix1 / U-3：转下周成功后历史项收敛（R1-2-T05-C05） =====
+
+  test('U-3 回归：carried=true → 状态「已转下周」、行划线变灰、无转下周/确认入口', async () => {
+    const { host } = mountComp(ReviewTaskList, {
+      tasks: [makeTask({ carried: true, carryable: false })], isClosed: true, carryingId: null,
+    })
+    await nextTick()
+    expect(host.textContent).toContain('已转下周')
+    expect(host.textContent).not.toContain('未安排')
+    expect(host.querySelector('.row.carried')).not.toBeNull() // 划线变灰由 .row.carried 承载
+    expect(host.querySelector('.carry-btn')).toBeNull()
+    expect(host.querySelector('.confirm-btn')).toBeNull()
+    expect(host.textContent).not.toContain('确认转为下周一次性任务？')
+  })
+
+  test('U-3 回归：确认后列表刷新为 carried → 确认条消失，无法继续确认', async () => {
+    const onCarry = vi.fn()
+    const p = reactive({
+      tasks: [makeTask()] as FlowReviewTask[],
+      isClosed: true,
+      carryingId: null as number | null,
+      onCarry,
+    })
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    createApp({ render: () => h(ReviewTaskList, p) }).mount(host)
+    await nextTick()
+
+    click(host, '.carry-btn')
+    await nextTick()
+    expect(host.textContent).toContain('确认转为下周一次性任务？')
+    click(host, '.confirm-btn')
+    expect(onCarry).toHaveBeenCalledTimes(1)
+
+    // 父级动作完成 → reload 后该行 carried=true / carryable=false
+    p.carryingId = 1
+    await nextTick()
+    p.carryingId = null
+    p.tasks = [makeTask({ carried: true, carryable: false })]
+    await nextTick()
+
+    expect(host.textContent).toContain('已转下周')
+    expect(host.textContent).not.toContain('确认转为下周一次性任务？')
+    expect(host.querySelector('.confirm-btn')).toBeNull()
+    expect(host.querySelector('.carry-btn')).toBeNull()
+    expect(onCarry).toHaveBeenCalledTimes(1) // 无法继续确认
+  })
+
+  test('U-3 前端防重复：同一 tick 连点「确认」只 emit 一次', async () => {
+    const onCarry = vi.fn()
+    const { host } = mountComp(ReviewTaskList, {
+      tasks: [makeTask()], isClosed: true, carryingId: null, onCarry,
+    })
+    await nextTick()
+    click(host, '.carry-btn')
+    await nextTick()
+    click(host, '.confirm-btn')
+    click(host, '.confirm-btn')
+    click(host, '.confirm-btn')
+    expect(onCarry).toHaveBeenCalledTimes(1)
+  })
+
+  test('U-3 失败可重试：动作结束（carryingId 归零）后确认仍可再次提交', async () => {
+    const onCarry = vi.fn()
+    const p = reactive({
+      tasks: [makeTask()] as FlowReviewTask[],
+      isClosed: true,
+      carryingId: null as number | null,
+      onCarry,
+    })
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    createApp({ render: () => h(ReviewTaskList, p) }).mount(host)
+    await nextTick()
+
+    click(host, '.carry-btn')
+    await nextTick()
+    click(host, '.confirm-btn')
+    p.carryingId = 1
+    await nextTick()
+    p.carryingId = null // 失败返回：tasks 不变，确认条保留
+    await nextTick()
+
+    expect(host.querySelector('.confirm-btn')).not.toBeNull()
+    click(host, '.confirm-btn')
+    expect(onCarry).toHaveBeenCalledTimes(2)
+  })
 
   test('F3 回归：转下周 → 确认 → emit carry(id)', async () => {
     const onCarry = vi.fn()

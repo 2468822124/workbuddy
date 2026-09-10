@@ -68,6 +68,13 @@ export const flowGoalRepo = {
   },
 
   createFocus(data: Omit<FlowWeekFocus, 'id' | 'isDeleted' | 'deletedAt' | 'createdAt' | 'updatedAt'>): FlowWeekFocus {
+    // R2 Fix1（U-4）：从月目标重复选取幂等——同周同月目标已有 active 行时返回既有行，不新增
+    if (data.monthGoalId !== null) {
+      const existing = getDb().prepare(
+        'SELECT * FROM flow_week_focus WHERE weekStart = ? AND monthGoalId = ? AND isDeleted = 0 LIMIT 1'
+      ).get(data.weekStart, data.monthGoalId)
+      if (existing) return rowToFocus(existing as Record<string, unknown>)
+    }
     const now = new Date().toISOString()
     const r = getDb().prepare(`
       INSERT INTO flow_week_focus (weekStart, title, monthGoalId, doneAt, sortOrder, isDeleted, deletedAt, createdAt, updatedAt)

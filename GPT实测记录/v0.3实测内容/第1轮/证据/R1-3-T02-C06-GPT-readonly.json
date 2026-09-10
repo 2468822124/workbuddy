@@ -1,0 +1,110 @@
+{
+  "testPoint": "R1-3-T02-C06",
+  "executedBy": "GPT",
+  "executedAt": "2026-08-30T23:16:25.6776358+08:00",
+  "readonly": true,
+  "queryOnly": 1,
+  "databaseId": "B1-20260829/R1-3/GPT-20260830/workbuddy.db",
+  "prefix": "v0.3-R1-3-GPT-20260830",
+  "integrity": "ok",
+  "hashBefore": "0C52BC17A6E533633078AAA2326D07B30C4F6A2B1B109041C32CECA078D5AC21",
+  "hashAfter": "0C52BC17A6E533633078AAA2326D07B30C4F6A2B1B109041C32CECA078D5AC21",
+  "hashUnchanged": true,
+  "prefixCounts": {
+    "flow_month_goals": 1,
+    "flow_week_focus": 1,
+    "flow_week_instances": 1,
+    "flow_day_entries": 1,
+    "completionVouchers": 3,
+    "todos": 0,
+    "plans": 0
+  },
+  "activePrefixCounts": {
+    "flow_month_goals": 1,
+    "flow_week_focus": 1,
+    "flow_week_instances": 1,
+    "flow_day_entries": 1,
+    "completionVouchers": 3
+  },
+  "monthGoals": [
+    {
+      "id": 1,
+      "month": "2026-08",
+      "title": "v0.3-R1-3-GPT-20260830-M1 月目标",
+      "closedAt": null,
+      "isDeleted": 0
+    }
+  ],
+  "weekFocus": [
+    {
+      "id": 1,
+      "weekStart": "2026-08-24",
+      "title": "v0.3-R1-3-GPT-20260830-M1 月目标",
+      "monthGoalId": 1,
+      "doneAt": null,
+      "isDeleted": 0
+    }
+  ],
+  "weekInstances": [
+    {
+      "id": 1,
+      "weekStart": "2026-08-24",
+      "origin": "temp",
+      "title": "v0.3-R1-3-GPT-20260830-I2 场次型任务",
+      "kind": "multi",
+      "targetCount": 3,
+      "skippedAt": null,
+      "carriedFrom": null,
+      "isDeleted": 0
+    }
+  ],
+  "dayEntries": [
+    {
+      "id": 2,
+      "date": "2026-08-30",
+      "title": "v0.3-R1-3-GPT-20260830-I2 场次型任务",
+      "source": "rail",
+      "locked": 1,
+      "weekInstanceId": 1,
+      "skippedAt": null,
+      "isDeleted": 0
+    }
+  ],
+  "completionVouchers": [
+    {
+      "id": 1,
+      "targetType": "day_entry",
+      "targetId": 2,
+      "kind": "check",
+      "occurredAt": "2026-08-30",
+      "isDeleted": 0
+    },
+    {
+      "id": 2,
+      "targetType": "week_instance",
+      "targetId": 1,
+      "kind": "extra",
+      "occurredAt": "2026-08-30",
+      "isDeleted": 0
+    },
+    {
+      "id": 3,
+      "targetType": "week_instance",
+      "targetId": 1,
+      "kind": "extra",
+      "occurredAt": "2026-08-30",
+      "isDeleted": 0
+    }
+  ],
+  "nonPrefixFlowCounts": {
+    "flow_month_goals": 0,
+    "flow_week_focus": 0,
+    "flow_week_instances": 0,
+    "flow_day_entries": 1
+  },
+  "interpretation": {
+    "gui3of3ExplainedBy": "one day_entry check plus two week_instance extra vouchers",
+    "scope": "Only the GPT R1-3 prefix was queried; non-prefix flow day count is retained as a count only.",
+    "dataChangedByReadonlyCheck": false
+  }
+}

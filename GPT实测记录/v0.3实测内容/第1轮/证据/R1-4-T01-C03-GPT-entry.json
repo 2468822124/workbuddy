@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "planId": "R1-4",
+  "testPoint": "R1-4-T01",
+  "scenario": "GPT formal S2 entry probe and visible-window selection",
+  "observedAt": "2026-09-08T21:23:33+08:00",
+  "snapshotId": "S2",
+  "qa": "QA2",
+  "role": "GPT",
+  "prefix": "v0.3-R1-4-GPT-20260908",
+  "entry": "E:\\workbuddy-test\\R1-4-S2\\启动R1-4实测.bat",
+  "selector": "E:\\workbuddy-test\\R1-4-S2\\选择R1-4实测角色.bat",
+  "program": "E:\\workbuddy-test\\R1-4-S2\\app\\WorkBuddy.exe",
+  "e0Evidence": "E:\\workbuddy-test\\R1-4-S2\\evidence\\R1-4-E0-preflight-attempt-20260908-211840.json",
+  "entryLog": "E:\\workbuddy-test\\R1-4-S2\\entry\\R1-4-entry.log",
+  "selectorResult": "exitCode=0; reused registered date copy 20260908; prefix/data matched R1-4 GPT registration",
+  "wrapperResult": "formal wrapper started; console output identified QA2/S2, R1-4, GPT prefix and isolated userData",
+  "processObservation": {
+    "duringLaunch": "WorkBuddy child processes were observed by the wrapper/E0 probe",
+    "visibleMainWindow": false,
+    "mainWindowHandle": 0,
+    "afterCleanup": "0 WorkBuddy processes"
+  },
+  "computerUseBackend": {
+    "cuaState": "only browser surface returned; apps=[]",
+    "nativeWindowApi": "unavailable",
+    "skyTarget": "unconfigured",
+    "result": "Could not acquire a current visible WorkBuddy window or screenshot"
+  },
+  "businessGuiExecuted": false,
+  "status": "blocked-visible-window-tooling",
+  "conclusion": "not-tested /待用户实测",
+  "safety": "No business IPC, DOM evaluation, SQL/SQLite write, or scripted business-data mutation was used."
+}

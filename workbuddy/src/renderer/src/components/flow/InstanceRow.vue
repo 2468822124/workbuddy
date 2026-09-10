@@ -12,6 +12,8 @@ const props = defineProps<{
   badge: string | null
   /** 历史周（weekStart < 本周一）→ 显示转下周 */
   isHistory: boolean
+  /** 已存在 active 承接实例（board 逐行透传；服务端派生，见 getWeekBoard） */
+  carried: boolean
   /** 本实例凭据（凭据弹层数据源） */
   vouchers: FlowVoucherView[]
 }>()
@@ -29,6 +31,12 @@ const emit = defineEmits<{
 }>()
 
 const display = computed(() => instanceDisplay(props.inst, props.completion))
+
+/** R1 Fix2（U-7）：转周入口生命周期——已转出 / 已完成 / 已跳过均不可再转
+ * （与服务端 carryInstance 守卫同一事实；点击必被拒的入口不展示，复盘页同法收敛） */
+const carryable = computed(
+  () => props.isHistory && !props.carried && display.value.state === 'open',
+)
 
 const editing = ref(false)
 const editTitle = ref('')
@@ -53,7 +61,7 @@ function saveRename(): void {
 </script>
 
 <template>
-  <li class="row" :class="[display.state, { locked: inst.origin === 'fixed' }]">
+  <li class="row" :class="[display.state, { locked: inst.origin === 'fixed', carried }]">
     <!-- 完成态（once：✓ 手动完成；multi：场次计数徽章；跳过：免罪灰显） -->
     <button
       v-if="display.state === 'open'"
@@ -89,6 +97,7 @@ function saveRename(): void {
             <AppIcon name="CalendarDays" :size="13" />{{ completion.arrangedCount }}
           </span>
           <span v-if="display.state === 'skipped'" class="skipped-tag">已跳过</span>
+          <span v-if="carried" class="carried-tag">已转下周</span>
         </template>
       </div>
     </div>
@@ -122,7 +131,7 @@ function saveRename(): void {
         <button class="icon-btn" title="跳过本周（不计未完成）" @click="confirm = 'skip'">
           <AppIcon name="SkipForward" :size="15" />
         </button>
-        <button v-if="isHistory" class="icon-btn" title="转下周（清债）" @click="emit('carryNext', inst.id)">
+        <button v-if="carryable" class="icon-btn" title="转下周（清债）" @click="emit('carryNext', inst.id)">
           <AppIcon name="MoveRight" :size="15" />
         </button>
         <button class="icon-btn danger" title="删除" @click="confirm = 'delete'">
@@ -156,6 +165,14 @@ function saveRename(): void {
 .row.skipped { opacity: .62; }
 .row.skipped .title { text-decoration: line-through; color: var(--text-faint); }
 .row.done .title { text-decoration: line-through; color: var(--text-muted); }
+/* R1 Fix2（U-7）：已转出行与复盘页同法划线变灰（源实例仍可补录凭据，不改状态） */
+.row.carried { opacity: .6; }
+.row.carried .title { text-decoration: line-through; color: var(--text-muted); }
+.carried-tag {
+  font-size: var(--fs-caption); letter-spacing: var(--tracking-wide);
+  color: var(--text-muted); background: var(--bg-hover);
+  border-radius: var(--r-pill); padding: 2px 8px;
+}
 .state-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 24px; height: 24px; border-radius: var(--r-sm);

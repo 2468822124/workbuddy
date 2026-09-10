@@ -1,0 +1,22 @@
+{
+  "reviewId": "Review3",
+  "observedAt": "2026-09-05T07:09:27.187Z",
+  "window": {
+    "app": "process:E:\\workbuddy 复审\\B3\\R3-Fix2-only\\app\\WorkBuddy.exe",
+    "id": 396442,
+    "title": "WorkBuddy"
+  },
+  "accessibility": {
+    "document_text": "R3-Review3-F1",
+    "focused_element": "16 文档 WorkBuddy ID: 774784",
+    "tree": "Window: \"WorkBuddy\", App: WorkBuddy.exe.\n\t0 窗格 WorkBuddy Secondary Actions: Raise\n\t\t16 文档 WorkBuddy ID: 774784\n\t\t\t17 状态\n\t\t\t\t18 文本 欢迎使用 WorkBuddy ☀ 前往「设置」配置你的 AI 与称呼\n\t\t\t\t19 按钮 知道了\n\t\t\t20 补充\n\t\t\t\t21 图像\n\t\t\t\t22 文本 WorkBuddy\n\t\t\t\t23 文本 你的工作伙伴\n\t\t\t\t24 导航\n\t\t\t\t\t25 文本 工作台\n\t\t\t\t\t26 图像\n\t\t\t\t\t27 文本 今日总览\n\t\t\t\t\t28 图像\n\t\t\t\t\t29 文本 项目\n\t\t\t\t\t30 图像\n\t\t\t\t\t31 文本 规划\n\t\t\t\t\t32 图像\n\t\t\t\t\t78 图像\n\t\t\t\t\t79 文本 日规划\n\t\t\t\t\t80 图像\n\t\t\t\t\t81 文本 周统筹\n\t\t\t\t\t82 图像\n\t\t\t\t\t83 文本 月指导\n\t\t\t\t\t84 图像\n\t\t\t\t\t85 文本 复盘趋势\n\t\t\t\t\t33 图像\n\t\t\t\t\t34 文本 知识库\n\t\t\t\t\t35 文本 敬请期待\n\t\t\t\t\t36 图像\n\t\t\t\t\t37 文本 运动\n\t\t\t\t\t38 文本 敬请期待\n\t\t\t\t\t39 文本 系统\n\t\t\t\t\t40 图像\n\t\t\t\t\t41 文本 设置\n\t\t\t\t42 文本 Agent 已唤醒\n\t\t\t\t43 文本 等待首次启动\n\t\t\t44 主要\n\t\t\t\t86 按钮 上周\n\t\t\t\t\t87 图像\n\t\t\t\t88 文本 W36 · 2026-08-31 ~ 09-06\n\t\t\t\t89 按钮 下周\n\t\t\t\t\t90 图像\n\t\t\t\t91 图像\n\t\t\t\t92 文本 0\n\t\t\t\t93 按钮 添加核心目标\n\t\t\t\t\t94 图像\n\t\t\t\t95 文本 从月目标选取或手写添加，本周最重要的 3~5 件事\n\t\t\t\t96 图像\n\t\t\t\t97 文本 0\n\t\t\t\t98 按钮 收起\n\t\t\t\t\t113 图像\n\t\t\t\t114 编辑 固定任务名（每周克隆）\n\t\t\t\t115 组合框\n\t\t\t\t116 文本 惯常日：\n\t\t\t\t117 复选框 一\n\t\t\t\t118 复选框 二\n\t\t\t\t119 复选框 三\n\t\t\t\t120 复选框 四\n\t\t\t\t121 复选框 五\n\t\t\t\t122 复选框 六\n\t\t\t\t123 复选框 日\n\t\t\t\t124 文本 不选 = 无惯常日（新周在清单出现，不进固定栏）\n\t\t\t\t125 按钮 保存\n\t\t\t\t101 图像\n\t\t\t\t102 文本 0\n\t\t\t\t103 按钮 添加任务\n\t\t\t\t\t104 图像\n\t\t\t\t105 图像\n\t\t\t\t106 文本 本周暂无任务，点右上 + 添加\n\t\t\t\t107 图像\n\t\t\t\t108 文本 0\n\t\t\t\t109 文本 🎉\n\t\t\t\t110 文本 全部已安排或已完成\n\t\t\t\t111 文本 本周未完成的任务会出现在这里；\n\t\t\t\t112 链接 去日规划选取 →\n\t\t2 窗格 (disabled)\n\t\t3 标题栏\n\t\t\t4 菜单栏 系统 ID: MenuBar\n\t\t\t\t5 菜单项目 系统\n\t\t\t6 按钮 最小化\n\t\t\t7 按钮 最大化\n\t\t\t8 按钮 关闭\n\t\t9 窗格\n\t\t\t10 窗格\n\t\t\t\t11 窗格\n\t\t\t\t\t12 窗格\n\t\t\t\t\t\t13 窗格\n\t\t\t\t\t\t\t14 窗格\n\t\t\t\t\t\t\t15 窗格\n\nDocument text: ```\nR3-Review3-F1\n```"
+  },
+  "screenshots": [
+    {
+      "name": "03-f1-name-0.jpg",
+      "id": "screenshot-0",
+      "width": 1186,
+      "height": 776
+    }
+  ]
+}

@@ -3,8 +3,10 @@ import { flowDayRepo } from '../db/repositories/flowDayRepo'
 import { flowVoucherRepo } from '../db/repositories/flowVoucherRepo'
 import { flowGoalRepo } from '../db/repositories/flowGoalRepo'
 import { projectTaskRepo } from '../db/repositories/projectTaskRepo'
+import { addDays } from '@shared/period'
 import {
   FlowWeekInstance,
+  FlowWeekBoardInstance,
   FlowDayEntry,
   InstanceCompletion,
   WeekBoard,
@@ -81,6 +83,16 @@ export function getWeekBoard(weekStart: string, today?: string): WeekBoard {
   const entryChecks = flowVoucherRepo.listActiveByTargets('day_entry', entryIds)
   const checkTargets = new Set(entryChecks.filter(v => v.kind === 'check').map(v => v.targetId))
 
+  // R1 Fix2（U-7）：转出标记与复盘 getReviewBoard 同一口径——
+  // 存在 active 承接实例（carriedFrom=本实例、目标周=本周+7）即视为已转出；
+  // 只读展示字段，源实例本身不改状态（承接实例被软删 → 自动回落 false）。
+  const instById = new Map(instances.map(i => [i.id, i]))
+  const carriedSourceIds = new Set<number>()
+  for (const c of flowWeekRepo.listActiveByCarriedFrom(instIds)) {
+    const src = c.carriedFrom === null ? undefined : instById.get(c.carriedFrom)
+    if (src && c.weekStart === addDays(src.weekStart, 7)) carriedSourceIds.add(src.id)
+  }
+
   const aggregates: InstanceAggregate[] = instances.map(inst => ({
     inst,
     entries: entries.filter(e => e.weekInstanceId === inst.id),
@@ -116,7 +128,11 @@ export function getWeekBoard(weekStart: string, today?: string): WeekBoard {
 
   return {
     weekStart,
-    instances: instances.map(inst => ({ ...inst, completion: completionMap.get(inst.id) as InstanceCompletion })),
+    instances: instances.map<FlowWeekBoardInstance>(inst => ({
+      ...inst,
+      completion: completionMap.get(inst.id) as InstanceCompletion,
+      carried: carriedSourceIds.has(inst.id),
+    })),
     rail,
     focus: flowGoalRepo.listFocusByWeek(weekStart),
     vouchers,
